@@ -1,17 +1,24 @@
 import express from "express";
 import {PORT, mongoDBURL} from "./config.js";
 import mongoose from "mongoose";
-import {Marker} from "./models/marker.js"
+import {Marker} from "./models/marker.js";
+import markerRoutes from "./routes/markerRoutes.js";
+import cors from "cors";
 
 const app = express();
 
 app.use(express.json());
+
+app.use(cors());
+
+
 app.get('/', (req, res) =>{
    console.log(req);
    return res.status(234).send("nice"); 
 });
 
-
+app.use('/marker', markerRoutes);
+/*
 app.post('/marker', async (req, res)=>{
     try{
         console.log("the req is", req);
@@ -35,7 +42,7 @@ app.post('/marker', async (req, res)=>{
         console.log(err.message);
         res.status(500).send({message: err.message});
     }
-})
+})*/
 
 mongoose
 .connect(mongoDBURL)

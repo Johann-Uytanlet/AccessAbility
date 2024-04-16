@@ -5,7 +5,7 @@ import {Marker} from "../models/marker.js"
 const router = express.Router();
 
 
-router.post('/marker', async (req, res)=>{
+router.post('/', async (req, res)=>{
     try{
         console.log("the req is", req);
         console.log('Received marker data:', req.body);
@@ -28,4 +28,6 @@ router.post('/marker', async (req, res)=>{
         console.log(err.message);
         res.status(500).send({message: err.message});
     }
-})
+});
+
+export default router;
