@@ -38,7 +38,7 @@ const UserRoutes = {
             return res.status(201).send({ message: 'Registration successful' });
         } catch( error ) {
             console.log(error.message);
-            return res.status(500).send({ message: `${error.message}` });
+            return res.status(505).send({ message: `${error.message}` });
         }
     },
 

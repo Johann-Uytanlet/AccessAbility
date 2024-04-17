@@ -1,40 +1,67 @@
-import { collection, addDoc } from 'firebase/firestore';
-import { db } from '../firebase/firebase.js';
+import { db, auth } from '../firebase/firebase.js';
+import { collection, addDoc, doc, setDoc, getDoc } from "firebase/firestore";
 
 const MarkerRoutes = {
 
 	createMarker: async (req, res) => {
 		try {
-			const { userID, location, lat, lng } = req.body;
-			const user = auth.currentUser;
+			const { location, lat, lng } = req.body;
+			const markersCollectionRef = collection(db, 'markers');
 
 			const newMarker = {
-				userID: user.uid,
-				username: user.username,
 				location,
 				averageRating: 0,
 				lat,
 				lng,
 			};
-			const markerRef = await addDoc( collection(db, 'markers'), newMarker );
-			res.status(201).json({ id: markerRef.id, ...newMarker });
+			const docRef = await addDoc(markersCollectionRef, newMarker);
+			return res.status(201).json({ message: 'Marker creation successful' });
 		} catch( error ) {
 			return res.status(500).json({ error: 'Failed to create marker' });
+		}
+	},
+
+	getMarker: async (req, res) => {
+		try {
+			const { markerID } = req.params;
+			const markerRef = doc(db, 'markers', markerID);
+			const markerSnapshot = await getDoc(markerRef);
+		
+			if( markerSnapshot.exists() ) {
+				const marker = { id: markerSnapshot.id, ...markerSnapshot.data() };
+				return res.status(200).json(marker);
+			} else {
+				return res.status(404).json({ error: 'Marker not found' });
+			}
+		} catch( error ) {
+		  	return res.status(500).json({ error: 'Failed to retrieve marker' });
 		}
 	},
 
 	getAllMarkers: async (req, res) => {
 		try {
 			const markersSnapshot = await getDocs(collection(db, 'markers'));
-			const markers = markersSnapshot.docs.map((doc) => ({
-				id: doc.id,
-				...doc.data(),
-			}));
-			res.status(200).json(markers);
+			const markers = [];
+			
+			if( markersSnapshot.exists() ) {
+				markersSnapshot.forEach((doc) => {
+					const data = doc.data();
+					markers.push({
+					  id: doc.uid,
+					  location: data.location,
+					  lat: data.lat,
+					  lng: data.lng,
+					});
+				  });;
+
+				return res.status(200).json(markers);
+			} else {
+				return res.status(404).json({ error: 'Markers not found' });
+			}
 		} catch( error ) {
-		  	return res.status(500).json({ error: 'Failed to retrieve markers' });
+		  	return res.status(500).json({ markers: null, error: 'Failed to retrieve markers' });
 		}
-	  },
+	},
 	
   	createMarkerReview: async (req, res) => {
 		try {
