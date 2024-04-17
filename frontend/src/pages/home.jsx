@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import LoginRegisterModal from './LoginRegisterModal.jsx';
+import LoginRegisterModal from '../components/modal/LoginRegisterModal.jsx';
 
 // import axios from 'axios';
 /*

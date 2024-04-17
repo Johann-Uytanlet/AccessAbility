@@ -32,7 +32,7 @@ export default function Login() {
         setLoading(true);
       
         try {
-          	const email = document.getElementById('email-input').value;
+        	const email = document.getElementById('email-input').value;
           	const password = document.getElementById('password-input').value;
       
           	const response = await fetch('/loginUser', {
