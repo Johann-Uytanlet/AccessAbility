@@ -1,11 +1,22 @@
 import React, { useState, useMemo, useCallback, useRef } from 'react';
 import { Marker, Popup } from 'react-leaflet';
+import tryIcon from '../assets/try.png'; 
 
 function reviewMarker({ data, onMarkerClick }) {
     const markerRef = useRef(null);
     const center = data.center;
     const name = data.name;
     const rating = data.rating;
+
+    const icon = useMemo(
+        () =>
+          new L.Icon({
+            iconUrl: tryIcon, // Set the icon URL to your tryIcon
+            iconSize: [50, 50], // Set the icon size
+            popupAnchor: [0, -25], // Adjust the popup anchor position
+          }),
+        []
+      );
 
   const eventHandlers = useMemo(
     () => ({
@@ -22,6 +33,7 @@ function reviewMarker({ data, onMarkerClick }) {
   return (
     <Marker
       eventHandlers={eventHandlers}
+      icon={icon} 
       position={center}
       ref={markerRef}>
       <Popup minWidth={90}>
