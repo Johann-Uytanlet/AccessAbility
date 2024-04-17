@@ -4,8 +4,14 @@ import "leaflet/dist/leaflet.css";
 import L, { Icon } from 'leaflet';
 import tryIcon from '../assets/try.png';
 import BACKEND_URL from '../../config.js';
+import MarkerDetails from './MarkerDetails';
+import MarkerReviewer from './MarkerReviewer';
 
 function MapComponent() {
+
+  /*************************************************************** 
+                            Variables
+  ***************************************************************/
   const [markers, setMarkers] = useState([]);
 
   const myIcon = new Icon({
@@ -18,6 +24,9 @@ function MapComponent() {
     fetchMarkers();
   }, []);
 
+  /*************************************************************** 
+                             Queries
+  ***************************************************************/
   const fetchMarkers = async () => {
     try {
         const response = await fetch(`${BACKEND_URL}/getAllMarkers`, {
@@ -82,6 +91,9 @@ function MapComponent() {
     }
   };
 
+  /*************************************************************** 
+                          Helper Functions
+  ***************************************************************/
   function generateStarRating(rating) {
     if (isNaN(rating) || rating < 0 || rating > 5) {
       return 'Invalid rating value.';
@@ -122,36 +134,39 @@ function MapComponent() {
     return null;
   }
 
-  const handleMarkerClick = async (marker) => {
-    const markerDetails = await getMarker(marker.id);
-    if (markerDetails) {
-      const { location, lat, lng, averageRating } = markerDetails;
-      const starString = generateStarRating(averageRating);
-      const customPopup = `
-        <b>Location:</b> ${location}<br/>
-        <b>Latitude:</b> ${lat}<br/>
-        <b>Longitude:</b> ${lng}<br/>
-        <b>Average Rating:</b> ${starString}
-      `;
+  /*************************************************************** 
+                            Variables
+  ***************************************************************/
+  const [selectedMarker, setSelectedMarker] = useState(null);
+  const [showMarkerDetails, setShowMarkerDetails] = useState(false);
+  const [showMarkerReviewer, setShowMarkerReviewer] = useState(false);
 
-      const customOptions = {
-        maxWidth: '400',
-        width: '200',
-        className: 'popupCustom',
-      };
+  const handleMarkerClick = (marker) => {
+    setSelectedMarker(marker);
+    setShowMarkerDetails(true);
+  };
 
-      L.popup(customOptions)
-        .setLatLng([marker.lat, marker.lng])
-        .setContent(customPopup)
-        .openOn(map);
+  const handleMarkerDetailsClose = () => {
+    setSelectedMarker(null);
+    setShowMarkerDetails(false);
+  };
 
-      const rating = parseFloat(prompt('Please enter your rating (0-5):'));
-      const comment = prompt('Please enter your comment:');
-      if (!isNaN(rating) && rating >= 0 && rating <= 5 && comment) {
-        await createMarkerReview(marker.id, rating, comment);
-      }
+  const handleReviewLocationClick = () => {
+    setShowMarkerDetails(false);
+    setShowMarkerReviewer(true);
+  };
+
+  const handleMarkerReviewSubmit = async (rating, comment) => {
+    if (selectedMarker) {
+      await createMarkerReview(selectedMarker.id, rating, comment);
+      setSelectedMarker(null);
+      setShowMarkerReviewer(false);
     }
   };
+
+  useEffect(() => {
+    fetchMarkers();
+  }, []);
 
   return (
     <div>
@@ -166,10 +181,26 @@ function MapComponent() {
               click: () => handleMarkerClick(marker),
             }}
           >
-            <Popup>{marker.location}</Popup>
+            <Popup>
+              Location: {marker.location}  
+              <br></br>
+              Ratings: {marker.averageRating}
+            
+            </Popup>
           </Marker>
         ))}
       </MapContainer>
+      <MarkerDetails
+        marker={selectedMarker}
+        show={showMarkerDetails}
+        onHide={handleMarkerDetailsClose}
+        onReviewClick={handleReviewLocationClick}
+      />
+      <MarkerReviewer
+        show={showMarkerReviewer}
+        onHide={() => setShowMarkerReviewer(false)}
+        onSubmit={handleMarkerReviewSubmit}
+      />
     </div>
   );
 }
