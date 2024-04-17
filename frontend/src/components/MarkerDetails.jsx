@@ -8,7 +8,7 @@ function MarkerDetails({ marker, show, onHide, onReviewClick }) {
         <Modal.Title>{marker?.location}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {/* Add any additional marker details here */}
+        { "Created by" } { marker?.username }
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onHide}>

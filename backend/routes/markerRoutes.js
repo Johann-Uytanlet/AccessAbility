@@ -6,10 +6,16 @@ const MarkerRoutes = {
 	createMarker: async (req, res) => {
 		try {
 			const { location, lat, lng } = req.body;
+			const currentUser = auth.currentUser;
+            const userRef = doc( db, 'users', currentUser.uid );
+            const userSnap = await getDoc(userRef);
+			const user = userSnap.data();
+
 			const markersCollectionRef = collection(db, 'markers');
 
 			const newMarkerRef = doc(markersCollectionRef);
 			await setDoc(newMarkerRef, {
+				username: user.username,
 				id: newMarkerRef.id,
 				location,
 				averageRating: 0,

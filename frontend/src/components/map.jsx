@@ -4,8 +4,8 @@ import "leaflet/dist/leaflet.css";
 import L, { Icon } from 'leaflet';
 import tryIcon from '../assets/try.png';
 import BACKEND_URL from '../../config.js';
-import MarkerDetails from './markerDetails.jsx';
-import MarkerReviewer from './markerReviewer.jsx';
+import MarkerDetails from './MarkerDetails.jsx';
+import MarkerReviewer from './MarkerReviewer.jsx';
 
 function MapComponent() {
 
@@ -54,7 +54,7 @@ function MapComponent() {
         };
 
         const response = await fetch(`${BACKEND_URL}/createMarker`, {
-            method: 'POST',
+            method:'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(form),
         });
