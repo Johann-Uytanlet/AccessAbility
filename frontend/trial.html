@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+    <!-- <meta http-equiv="X-UA-Compatible" content="IE-edge">  -->
+    <!-- <meta name="viewport"  content="width=device-width, initial-scale=1.0">  -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""/>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin="">
+    </script>
+
+    <style>
+        #map {height: 1000px;}
+    </style>
+</head>
+
+<body> 
+    <div id="map" ></div>
+</body>
+
+<script>
+var map = L.map('map').setView([51.505, -0.09], 13);
+var markerLayer = L.layerGroup().addTo(map);
+
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(map);
+
+// get users current location
+//navigator.geolocation.getCurrentPosition(success, error);
+// gets user current location continuously
+
+let marker, circle, zoomed;
+
+navigator.geolocation.watchPosition(success, error);
+function success(pos){
+    const lat = pos.coords.latitude;
+    const lng = pos.coords.longitude;
+    const accuracy = pos.coords.accuracy;
+
+    
+    if(marker){
+        map.removeLayer(marker); // remove previous marker, when marker is update previous marker should not appear
+        map.removeLayer(circle); 
+    }
+
+    marker = L.marker([lat, lng]).addTo(map);
+    circle = L.circle([lat,lng], {radius: accuracy}).addTo(map);
+
+    if(!zoomed){ // stay same level of zoom while following marker
+       zoomed =  map.fitBounds(circle.getBounds());
+    }
+
+    map.setView([lat, lng]);
+}
+
+function error(err){
+    if(err.code === 1){
+        alert("please allow geolocation accesss");
+    } else {
+        alert("cannot get current location")
+    }
+}
+function onMapClick(e) {
+    var confirmAdd = confirm("Do you want to add a marker here?");
+    if (confirmAdd) {
+        var name = prompt("Enter the name for the marker:");
+        while (!name) {
+            alert("Please enter a name for the marker.");
+            name = prompt("Enter the name for the marker:");
+        }
+
+        var rating = prompt("Enter the rating (1-5) for the marker:");
+        while (!rating || isNaN(rating) || rating < 1 || rating > 5) {
+            alert("Please enter a valid rating between 1 and 5.");
+            rating = prompt("Enter the rating (1-5) for the marker:");
+        }
+
+        // comments are optional
+        var comments = prompt("Enter comments for the marker:");
+
+        var markerContent = "<b>Name:</b> " + name + "<br><b>Rating:</b> " + rating + "<br><b>Comments:</b> " + comments;
+
+        console.log("lat lang is");
+        console.log(e.latlng);
+
+        var newMarker = L.marker(e.latlng).addTo(markerLayer).bindPopup(markerContent).openPopup();
+    }
+}
+
+
+map.on('click', onMapClick);
+
+</script>
+
+
+</html>

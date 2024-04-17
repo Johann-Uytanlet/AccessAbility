@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import LoginRegisterModal from './LoginRegisterModal.jsx';
+
+// import axios from 'axios';
 /*
 import Spinner from '../components/Spinner';
 import { Link } from 'react-router-dom';
@@ -13,8 +15,7 @@ const Home = () => {
 
   return (
     <div>
-        <p>asdfasdf </p>
-      HOOOOOOOOOOOOOOOME 
+      <LoginRegisterModal> </LoginRegisterModal>
     </div>
   );
 };

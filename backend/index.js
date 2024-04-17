@@ -1,15 +1,21 @@
 import express from "express";
+<<<<<<< Updated upstream
 import {PORT, mongoDBURL} from "./config.js";
 import mongoose from "mongoose";
 import {Marker} from "./models/marker.js";
 import markerRoutes from "./routes/markerRoutes.js";
+=======
+import { PORT } from "./config.js";
+>>>>>>> Stashed changes
 import cors from "cors";
+import router from "./router.js";
 
 const app = express();
 
 app.use(express.json());
 
 app.use(cors());
+app.use(router);
 
 
 app.get('/', (req, res) =>{
@@ -17,6 +23,7 @@ app.get('/', (req, res) =>{
    return res.status(234).send("nice"); 
 });
 
+<<<<<<< Updated upstream
 app.use('/marker', markerRoutes);
 /*
 app.post('/marker', async (req, res)=>{
@@ -54,3 +61,8 @@ mongoose
 .catch((err) => {
     console.log(err);
 });
+=======
+app.listen(PORT, () => {
+    console.log(`App is listening to port: ${PORT}`);
+});
+>>>>>>> Stashed changes
