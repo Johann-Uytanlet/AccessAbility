@@ -1,5 +1,5 @@
 import { db, auth } from '../firebase/firebase.js';
-import { collection, addDoc, doc, setDoc, getDoc } from "firebase/firestore";
+import { collection, addDoc, doc, setDoc, getDoc, getDocs } from "firebase/firestore";
 
 const MarkerRoutes = {
 
@@ -8,19 +8,35 @@ const MarkerRoutes = {
 			const { location, lat, lng } = req.body;
 			const markersCollectionRef = collection(db, 'markers');
 
-			const newMarker = {
+			const newMarkerRef = doc(markersCollectionRef);
+			await setDoc(newMarkerRef, {
+				id: newMarkerRef.id,
 				location,
 				averageRating: 0,
 				lat,
 				lng,
-			};
-			const docRef = await addDoc(markersCollectionRef, newMarker);
+			});
+
 			return res.status(201).json({ message: 'Marker creation successful' });
 		} catch( error ) {
 			return res.status(500).json({ error: 'Failed to create marker' });
 		}
 	},
 
+	getAllMarkers: async (req, res) => {
+		try {
+			const markers = [];
+			const markersCollectionRef = collection(db, 'markers');
+			const markersSnapshot = await getDocs(markersCollectionRef);
+			markersSnapshot.forEach((doc) => {
+				markers.push(doc.data());
+			});
+			return res.status(200).json(markers);
+		} catch( error ) {
+		  	return res.status(500).json({ error: 'Failed to retrieve markers' });
+		}
+	},
+	
 	getMarker: async (req, res) => {
 		try {
 			const { markerID } = req.params;
@@ -38,31 +54,6 @@ const MarkerRoutes = {
 		}
 	},
 
-	getAllMarkers: async (req, res) => {
-		try {
-			const markersSnapshot = await getDocs(collection(db, 'markers'));
-			const markers = [];
-			
-			if( markersSnapshot.exists() ) {
-				markersSnapshot.forEach((doc) => {
-					const data = doc.data();
-					markers.push({
-					  id: doc.uid,
-					  location: data.location,
-					  lat: data.lat,
-					  lng: data.lng,
-					});
-				  });;
-
-				return res.status(200).json(markers);
-			} else {
-				return res.status(404).json({ error: 'Markers not found' });
-			}
-		} catch( error ) {
-		  	return res.status(500).json({ markers: null, error: 'Failed to retrieve markers' });
-		}
-	},
-	
   	createMarkerReview: async (req, res) => {
 		try {
 			const { markerID, userID, rating, comment, filePath } = req.body;

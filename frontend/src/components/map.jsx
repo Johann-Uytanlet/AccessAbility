@@ -24,24 +24,15 @@ function MapComponent() {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' }
         });
-
-        if( response.data ) {
-            setMarkers(response.data);
+        if( response.ok ) {
+          const data = await response.json();
+          setMarkers(data);
+        } else {
+          const errorData = await response.json();
+          console.error('Error fetching markers:', errorData.error);
         }
     } catch (error) {
       console.error('Error fetching markers:', error);
-    }
-  };
-
-  const getMarker = async (markerID) => {
-    try {
-        const response = await fetch(`${BACKEND_URL}/getMarker/${markerID}`, {
-            method: 'GET',
-        });
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching marker details:', error);
-      return null;
     }
   };
 
@@ -61,6 +52,7 @@ function MapComponent() {
         
         if( response.ok ) {
             alert("MARKER WAS CREATEED");
+            fetchMarkers();
         } else {
             alert( `${response.message}`)
         }
@@ -168,14 +160,13 @@ function MapComponent() {
         <MyComponent />
         {markers.map((marker) => (
           <Marker
-            key={marker.id}
             position={[marker.lat, marker.lng]}
             icon={myIcon}
             eventHandlers={{
               click: () => handleMarkerClick(marker),
             }}
           >
-            <Popup>{marker.name}</Popup>
+            <Popup>{marker.location}</Popup>
           </Marker>
         ))}
       </MapContainer>
