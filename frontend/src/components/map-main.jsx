@@ -7,44 +7,75 @@ import axios from 'axios';
 import DraggableMarker from './customMarker';
 import ReviewMarker from './reviewMarker';
 
-    function MapComponent() {
+function MapComponent() {
     const [markers, setMarkers] = useState([]); // Array to store marker data
-    //const [markerCoordinates, setMarkerCoordinates] = useState(null);
     const [selectedMarker, setSelectedMarker] = useState(null); // State to store selected marker
     const [sidebarOpen, setSidebarOpen] = useState(false); // State to manage sidebar visibility
 
     const myIcon = new Icon({
-
       iconUrl: tryIcon,
-    
       iconSize: [50, 50],
-    
       popupAnchor: [0, -41],
-    
     });
-    
 
-    const handleAddMarker = (name, rating, comment, latlng) => {
-      const data = {
-        name,
-        rating,
-        comment,
-        latlng
-      };
-      /*
-      axios
-        .post('http://localhost:5555/marker', data)
-        .then(() => {
-          setLoading(false);
-          enqueueSnackbar('Book Created successfully', { variant: 'success' });
-          navigate('/');
-        })
-        .catch((error) => {
-          // alert('An error happened. Please Chack console');
-          enqueueSnackbar('Error', { variant: 'error' });
-          console.log(error);
-        });*/
+    useEffect(() => {
+      fetchMarkers();
+    }, []);
+
+    const fetchMarkers = async () => {
+      try {
+          const response = await fetch(`${BACKEND_URL}/getAllMarkers`, {
+              method: 'GET',
+              headers: { 'Content-Type': 'application/json' }
+          });
+          if( response.ok ) {
+            const data = await response.json();
+            setMarkers(data);
+          } else {
+            const errorData = await response.json();
+            console.error('Error fetching markers:', errorData.error);
+          }
+      } catch (error) {
+        console.error('Error fetching markers:', error);
+      }
     };
+
+    async function createMarker( name, lat, lng ) {
+      try {
+          const form = {
+              location: name, 
+              lat: lat,
+              lng: lng
+          };
+  
+          const response = await fetch(`${BACKEND_URL}/createMarker`, {
+              method:'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(form),
+          });
+          
+          if( response.ok ) {
+              alert("MARKER WAS CREATEED");
+              fetchMarkers();
+          } else {
+              alert( `${response.message}`)
+          }
+  
+      } catch(error) {
+        console.error('Error creating marker:', error);
+        alert("MARKER WAS NOT CREATED");
+      }
+    };
+
+    function MyMarkers({ markers }) {
+      return (
+        <>
+          {markers.map((marker, index) => (
+            <ReviewMarker key={index} data={marker} onMarkerClick={handleMarkerClick} />
+          ))}
+        </>
+      );
+    }
 
     function generateStarRating(rating) {
       if (isNaN(rating) || rating < 0 || rating > 5) {
@@ -85,23 +116,18 @@ import ReviewMarker from './reviewMarker';
                   rating = parseFloat(rating);
                 } while (isNaN(rating) || rating < 0 || rating > 5);
                 
-                
-                  let starString = generateStarRating(rating);
-                  var customPopup = `<div>
-                                      <b>Name</b>: ${name}<br />
-                                      <b>Rating</b>: ${starString}<br />
-                                      </div>`;
+              
+                  let center = [lat, lng]
+                  const newMarker = {
+                    center,
+                    name,
+                    rating,
+                  };
 
-                  // specify popup options 
-                  var customOptions =
-                      {
-                      'fontSize': '30px',
-                      'maxWidth': '800',
-                      'width': '500',
-                      'className' : 'popupCustom'
-                      }
+                  createMarker(name, lat, lng);
+                  // setMarkers(prevMarkers => [...prevMarkers, newMarker]);
                   // `name: ${name}, rating: ${rating}, comment: ${comment}`
-                  L.marker([lat, lng], { icon: myIcon }).addTo(map).bindPopup(customPopup, customOptions).openPopup();
+                  //L.marker([lat, lng], { icon: myIcon }).addTo(map).bindPopup(customPopup, customOptions).openPopup();
                   //handleAddMarker(name, rating, comment, [lat, lng])
               }
           }
@@ -109,15 +135,7 @@ import ReviewMarker from './reviewMarker';
         return null;
       }
 
-    useEffect(() => {
-        // Replace with your actual marker data
-        const initialMarkers = [
-            { lat: 14.586598, lng: 120.976342, name: "UAC", rating: "★★★★★" },
-            { lat: 14.5865, lng: 120.9763, name: "PLM", rating: "★★★★★" },
-        // Add more markers here
-        ];
-        setMarkers(initialMarkers);
-    }, []);
+    
 
     const handleMarkerClick = (data) => {
       console.log("Here");
@@ -149,18 +167,8 @@ import ReviewMarker from './reviewMarker';
         <MapContainer center={[14.586598,120.976342]} zoom={20} style={{ height: '900px', width: '100%' }}>
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         <MyComponent />
-        <ReviewMarker data={{center: [14.58659, 120.97634], name: "PLM", rating: 5}} onMarkerClick={handleMarkerClick}  />
-        <ReviewMarker data={{center: [14.5865933, 120.9763411], name: "UAC", rating: 3}} onMarkerClick={handleMarkerClick}  />
-        {markers.map((marker) => (
-            <Marker key={marker.lat + marker.lng} position={[marker.lat, marker.lng]} icon = {myIcon}>
-            <Popup>
-              <div style={{ fontSize: '20px' }}>
-                  <strong>Name:</strong> {marker.name}<br />
-                  <strong>Rating:</strong> {marker.rating}<br />
-              </div>
-            </Popup>
-            </Marker>
-        ))}
+        
+        <MyMarkers markers={markers} />
         </MapContainer>
         
       </div>
