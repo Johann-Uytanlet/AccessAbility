@@ -4,7 +4,6 @@ import BACKEND_URL from '../../../config.js';
 import { Modal, Button, Form, FloatingLabel, ModalBody, ModalHeader } from 'react-bootstrap';
 import "./modal.css"
 
-
 // Brand Utilities
 import brandname from "/logo/brandname.png";
 import logo from "/logo/logo.png";
@@ -55,7 +54,7 @@ const LoginRegisterModal = () => {
         } catch( error ) {
             console.error('Error checking login status:', error);
         }
-      };
+    };
             
 
     const handleLogin = async (e) => {
@@ -213,7 +212,7 @@ const LoginRegisterModal = () => {
     </div>
             ):(<div></div>)}
         <Modal.Footer className="d-flex justify-content-center align-items-center">
-          <Button variant="primary" className="px-3" onClick={handleLoginClose}>Login</Button>
+          <Button variant="primary" className="px-3" onClick={handleLogin}>Login</Button>
         </Modal.Footer>
         </>
             
@@ -251,8 +250,11 @@ const LoginRegisterModal = () => {
               </ModalBody>
             </>
         <Modal.Footer className="d-flex justify-content-center align-items-center">
-          <Button variant="primary" className="px-3" onClick={handleRegisterClose}>
+          <Button variant="primary" className="px-3" onClick={handleRegister}>
             Register
+          </Button>
+          <Button variant="primary" className="px-3" onClick={handleRegisterClose}>
+            Close
           </Button>
         </Modal.Footer>
     </Modal>
