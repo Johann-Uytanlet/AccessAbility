@@ -1,10 +1,21 @@
-    import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
     import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
     import "leaflet/dist/leaflet.css";
 
     function MapComponent() {
     const [markers, setMarkers] = useState([]); // Array to store marker data
 
+    const myIcon = L.icon({
+
+      iconUrl: 'try.png',
+    
+      iconSize: [25, 41],
+    
+      iconAnchor: [12.5, 41],
+    
+      popupAnchor: [0, -41],
+    
+    });
 
     function MyComponent() {
         const map = useMapEvents({
@@ -19,8 +30,18 @@
         
                 // Validate input (optional)
                 // You can add checks for valid name format, rating within range (0-5), and comment length
-        
-                L.marker([lat, lng]).addTo(map).bindPopup(`name: ${name}, rating: ${rating}, comment: ${comment}`).openPopup();;
+
+                var customPopup = `<b>name</b>: ${name}<br/> <b>rating</b>: ${rating}<br/> <b>comment</b>: ${comment}<br/>`;
+
+                // specify popup options 
+                var customOptions =
+                    {
+                    'maxWidth': '400',
+                    'width': '200',
+                    'className' : 'popupCustom'
+                    }
+                // `name: ${name}, rating: ${rating}, comment: ${comment}`
+                L.marker([lat, lng], { icon: myIcon }).addTo(map).bindPopup(customPopup, customOptions).openPopup();;
               }
           }
         });
@@ -37,8 +58,10 @@
         setMarkers(initialMarkers);
     }, []);
 
+    
+
     return (
-        <MapContainer center={[14.586598,120.976342]} zoom={20} style={{ height: '400px', width: '100%' }}>
+        <MapContainer center={[14.586598,120.976342]} zoom={20} style={{ height: '900px', width: '100%' }}>
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         <MyComponent />
         {markers.map((marker) => (
