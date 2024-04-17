@@ -11,7 +11,7 @@ import React, { useState, useEffect } from 'react';
 
       iconUrl: tryIcon,
     
-      iconSize: [50, 50],
+      iconSize: [40, 40],
     
       //iconAnchor: [12.5, 41],
     
