@@ -41,6 +41,31 @@ import React, { useState, useEffect } from 'react';
         });*/
     };
 
+    function generateStarRating(rating) {
+      if (isNaN(rating) || rating < 0 || rating > 5) {
+        return 'Invalid rating value.';
+      }
+
+      const fullStar = '★';
+      const emptyStar = '☆';
+      let starString = '';
+
+      for (let i = 0; i < Math.floor(rating); i++) {
+        starString += fullStar;
+      }
+
+      const decimalPart = rating - Math.floor(rating);
+      if (decimalPart > 0) {
+        starString += fullStar.slice(0, 1); // Add half star if needed
+      }
+
+      for (let i = Math.floor(rating) + (decimalPart > 0 ? 1 : 0); i < 5; i++) {
+        starString += emptyStar;
+      }
+
+      return starString;
+    };
+
     function MyComponent() {
         const map = useMapEvents({
           click: (e) => {
@@ -59,7 +84,8 @@ import React, { useState, useEffect } from 'react';
                 } while (isNaN(rating) || rating < 0 || rating > 5);
                 
                 
-                  var customPopup = `<b>name</b>: ${name}<br/> <b>rating</b>: ${rating}<br/>`;
+                  let starString = generateStarRating(rating);
+                  var customPopup = `<b>name</b>: ${name}<br/> <b>rating</b>: ${starString}<br/>`;
 
                   // specify popup options 
                   var customOptions =
