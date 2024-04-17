@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Home from './pages/home.jsx';
+import Map from './pages/mapPage.jsx';
 /*
 import CreateBook from './pages/CreateBooks';
 import ShowBook from './pages/ShowBook';
@@ -12,6 +13,7 @@ const App = () => {
     <Routes>
       <Route path='/' element={<Home />} />
       <Route path='/asdf' element={<Home />} />
+      <Route path='/map' element={<Map />}/>
     </Routes>
   ); 
 };
