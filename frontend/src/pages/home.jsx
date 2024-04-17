@@ -9,10 +9,15 @@ import { MdOutlineAddBox, MdOutlineDelete } from 'react-icons/md';
 import BooksTable from '../components/home/BooksTable';
 import BooksCard from '../components/home/BooksCard';
 */
+
+import NavBar from "../components/navbar/navbar.jsx"
+
 const Home = () => {
 
   return (
+    
     <div>
+      <NavBar />
         <p>asdfasdf </p>
       HOOOOOOOOOOOOOOOME 
     </div>

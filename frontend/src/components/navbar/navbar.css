@@ -1,0 +1,35 @@
+
+nav{
+    display: flex;
+    justify-content: space-between;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Adjust the values to get the desired shadow effect */
+}
+
+.home{
+    display: flex;
+    height: 60px;
+    align-items: center;
+}
+
+.home p{
+    color: rgb(190, 190, 190);
+}
+
+.userauth{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#logo{
+    height: 40px;
+    margin-left: 10px;
+}
+
+#namelogo{
+    height: 50px;
+}
+
+
+
