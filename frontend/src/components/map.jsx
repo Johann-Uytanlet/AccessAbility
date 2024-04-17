@@ -13,6 +13,16 @@ import ReviewMarker from './reviewMarker';
     const [selectedMarker, setSelectedMarker] = useState(null); // State to store selected marker
     const [sidebarOpen, setSidebarOpen] = useState(false); // State to manage sidebar visibility
 
+    useEffect(() => {
+      // Replace with your actual marker data
+      const initialMarkers = [
+        { center: [14.586598, 120.976342], name: "UAC", rating: 5 },
+        { center: [14.5865, 120.9763], name: "PLM", rating: 5 },
+        // Add more markers here
+      ];
+      setMarkers(initialMarkers);
+    }, []);
+
     const myIcon = new Icon({
 
       iconUrl: tryIcon,
@@ -22,6 +32,16 @@ import ReviewMarker from './reviewMarker';
       popupAnchor: [0, -41],
     
     });
+
+    function MyMarkers({ markers }) {
+      return (
+        <>
+          {markers.map((marker, index) => (
+            <ReviewMarker key={index} data={marker} onMarkerClick={handleMarkerClick} />
+          ))}
+        </>
+      );
+    }
     
 
     const handleAddMarker = (name, rating, comment, latlng) => {
@@ -100,8 +120,17 @@ import ReviewMarker from './reviewMarker';
                       'width': '500',
                       'className' : 'popupCustom'
                       }
+                      let center = [lat, lng]
+                      const newMarker = {
+                        center,
+                        name,
+                        rating,
+                      };
+
+                      setMarkers(prevMarkers => [...prevMarkers, newMarker]);
+
                   // `name: ${name}, rating: ${rating}, comment: ${comment}`
-                  L.marker([lat, lng], { icon: myIcon }).addTo(map).bindPopup(customPopup, customOptions).openPopup();
+                  //L.marker([lat, lng], { icon: myIcon }).addTo(map).bindPopup(customPopup, customOptions).openPopup();
                   //handleAddMarker(name, rating, comment, [lat, lng])
               }
           }
@@ -109,15 +138,7 @@ import ReviewMarker from './reviewMarker';
         return null;
       }
 
-    useEffect(() => {
-        // Replace with your actual marker data
-        const initialMarkers = [
-            { lat: 14.586598, lng: 120.976342, name: "UAC", rating: "★★★★★" },
-            { lat: 14.5865, lng: 120.9763, name: "PLM", rating: "★★★★★" },
-        // Add more markers here
-        ];
-        setMarkers(initialMarkers);
-    }, []);
+    
 
     const handleMarkerClick = (data) => {
       console.log("Here");
@@ -149,18 +170,8 @@ import ReviewMarker from './reviewMarker';
         <MapContainer center={[14.586598,120.976342]} zoom={20} style={{ height: '900px', width: '100%' }}>
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         <MyComponent />
-        <ReviewMarker data={{center: [14.58659, 120.97634], name: "PLM", rating: 5}} onMarkerClick={handleMarkerClick}  />
-        <ReviewMarker data={{center: [14.5865933, 120.9763411], name: "UAC", rating: 3}} onMarkerClick={handleMarkerClick}  />
-        {markers.map((marker) => (
-            <Marker key={marker.lat + marker.lng} position={[marker.lat, marker.lng]} icon = {myIcon}>
-            <Popup>
-              <div style={{ fontSize: '20px' }}>
-                  <strong>Name:</strong> {marker.name}<br />
-                  <strong>Rating:</strong> {marker.rating}<br />
-              </div>
-            </Popup>
-            </Marker>
-        ))}
+        
+        <MyMarkers markers={markers} />
         </MapContainer>
         
       </div>
