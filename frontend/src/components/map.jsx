@@ -4,8 +4,8 @@ import "leaflet/dist/leaflet.css";
 import L, { Icon } from 'leaflet';
 import tryIcon from '../assets/try.png';
 import BACKEND_URL from '../../config.js';
-import MarkerDetails from './MarkerDetails';
-import MarkerReviewer from './MarkerReviewer';
+import MarkerDetails from './markerDetails.jsx';
+import MarkerReviewer from './markerReviewer.jsx';
 
 function MapComponent() {
 

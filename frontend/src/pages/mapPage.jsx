@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Map from '../components/map.jsx';
+import NavBar from '../components/navbar/Navbar.jsx';
+
 const mapPage = () => {
 
   return (
     <div>
-      <h1>Map Page</h1>
+      <NavBar />
       <Map />
     </div>
   );
