@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
-    import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
-    import "leaflet/dist/leaflet.css";
-    import L, {Icon, icon} from 'leaflet';
-    import tryIcon from '../assets/try.png'; 
-    import axios from 'axios';
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
+import "leaflet/dist/leaflet.css";
+import L, {Icon, icon} from 'leaflet';
+import tryIcon from '../assets/try.png'; 
+import axios from 'axios';
+import DraggableMarker from './customMarker';
 
     function MapComponent() {
     const [markers, setMarkers] = useState([]); // Array to store marker data
+    const [markerCoordinates, setMarkerCoordinates] = useState(null);
+    const [selectedMarker, setSelectedMarker] = useState(null); // State to store selected marker
+    const [sidebarOpen, setSidebarOpen] = useState(false); // State to manage sidebar visibility
+
     const myIcon = new Icon({
 
       iconUrl: tryIcon,
@@ -71,10 +76,7 @@ import React, { useState, useEffect } from 'react';
             const { lat, lng } = e.latlng;
             const name = prompt(
                 'What is the name of the Building?'
-            );
-            
-            
-        
+            );     
               if (name) {
                 let rating;
                 do {
@@ -116,24 +118,53 @@ import React, { useState, useEffect } from 'react';
         setMarkers(initialMarkers);
     }, []);
 
+    const handleMarkerClick = (lat, lng) => {
+      console.log("Here");
+      console.log(lat, lng);
+      setSidebarOpen(true);
+      setMarkerCoordinates({ lat, lng });
+    };
+
+    const closeSidebar = () => {
+      setSidebarOpen(false);
+    };
+
     return (
-      <div>
+      <div style={{ display: 'flex', height: '100vh' }}>
+        {sidebarOpen && (
+      <div className="sidebar">
+        <button className="close-button" onClick={closeSidebar}>Close</button>
+        {markerCoordinates && (
+          <div>
+            <h3>Marker Coordinates</h3>
+            <p>Latitude: {markerCoordinates.lat}</p>
+            <p>Longitude: {markerCoordinates.lng}</p>
+          </div>
+        )}
+      </div>
+    )}
         <MapContainer center={[14.586598,120.976342]} zoom={20} style={{ height: '900px', width: '100%' }}>
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         <MyComponent />
+        <DraggableMarker center={[14.58659, 120.97634]} onMarkerClick={handleMarkerClick}  />
+        <DraggableMarker center={[14.58659, 120.9763]} onMarkerClick={handleMarkerClick}  />
         {markers.map((marker) => (
             <Marker key={marker.lat + marker.lng} position={[marker.lat, marker.lng]} icon = {myIcon}>
             <Popup>
-                        <div style={{ fontSize: '20px' }}>
-                            <strong>Name:</strong> {marker.name}<br />
-                            <strong>Rating:</strong> {marker.rating}<br />
-                        </div></Popup>
+              <div style={{ fontSize: '20px' }}>
+                  <strong>Name:</strong> {marker.name}<br />
+                  <strong>Rating:</strong> {marker.rating}<br />
+              </div>
+            </Popup>
             </Marker>
         ))}
         </MapContainer>
+        
       </div>
         
     );
     }
+
+    
     
     export default MapComponent;
