@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
     import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
     import "leaflet/dist/leaflet.css";
+    import L, {Icon, icon} from 'leaflet';
+    import tryIcon from '../assets/try.png'; 
 
     function MapComponent() {
     const [markers, setMarkers] = useState([]); // Array to store marker data
 
-    const myIcon = L.icon({
+    const myIcon = new Icon({
 
-      iconUrl: 'try.png',
+      iconUrl: tryIcon,
     
-      iconSize: [25, 41],
+      iconSize: [50, 50],
     
-      iconAnchor: [12.5, 41],
+      //iconAnchor: [12.5, 41],
     
       popupAnchor: [0, -41],
     
@@ -65,7 +67,7 @@ import React, { useState, useEffect } from 'react';
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         <MyComponent />
         {markers.map((marker) => (
-            <Marker key={marker.lat + marker.lng} position={[marker.lat, marker.lng]}>
+            <Marker key={marker.lat + marker.lng} position={[marker.lat, marker.lng]} icon = {myIcon}>
             <Popup>{marker.popupContent}</Popup>
             </Marker>
         ))}
