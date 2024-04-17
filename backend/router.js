@@ -12,6 +12,9 @@ router.post( '/register', UserRoutes.registerUser )
 router.post( '/logout', UserRoutes.logoutUser )
 
 // - MarkerRoutes
-// router.post( '/createMarker', MarkerRoutes.createMarker )
+router.get( '/getAllMarkers', MarkerRoutes.getAllMarkers );
+router.get( '/getMarkerReviews', MarkerRoutes.getMarkerReviews );
+router.post( '/createmarker', MarkerRoutes.createMarker );
+router.post( '/createMarkerReview', MarkerRoutes.createMarkerReview )
 
 export default router;

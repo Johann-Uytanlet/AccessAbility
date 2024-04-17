@@ -4,7 +4,7 @@ import { collection, addDoc, doc, setDoc, getDoc } from "firebase/firestore";
 
 const UserRoutes = {
 
-    loginUser: async( req, res ) => {
+    loginUser: async (req, res) => {
         try {
             const { email, password } = req.body;
 
@@ -19,7 +19,7 @@ const UserRoutes = {
         }
     },
 
-    registerUser: async( req, res ) => {
+    registerUser: async (req, res) => {
         try {
             const { username, birthday, email, password } = req.body;
     
@@ -42,7 +42,7 @@ const UserRoutes = {
         }
     },
 
-    logoutUser: async( req, res ) => {
+    logoutUser: async (req, res) => {
         try {
             signOut(auth)
             return res.status(201).send({ message: 'Logout successful' });
@@ -52,7 +52,7 @@ const UserRoutes = {
         }
     },
 
-    getUserData: async( req, res ) => {
+    getUserData: async (req, res) => {
         try {
             const user = auth.currentUser;
             if( !user ) {
