@@ -5,10 +5,11 @@ import L, {Icon, icon} from 'leaflet';
 import tryIcon from '../assets/try.png'; 
 import axios from 'axios';
 import DraggableMarker from './customMarker';
+import ReviewMarker from './reviewMarker';
 
     function MapComponent() {
     const [markers, setMarkers] = useState([]); // Array to store marker data
-    const [markerCoordinates, setMarkerCoordinates] = useState(null);
+    //const [markerCoordinates, setMarkerCoordinates] = useState(null);
     const [selectedMarker, setSelectedMarker] = useState(null); // State to store selected marker
     const [sidebarOpen, setSidebarOpen] = useState(false); // State to manage sidebar visibility
 
@@ -118,11 +119,10 @@ import DraggableMarker from './customMarker';
         setMarkers(initialMarkers);
     }, []);
 
-    const handleMarkerClick = (lat, lng) => {
+    const handleMarkerClick = (data) => {
       console.log("Here");
-      console.log(lat, lng);
       setSidebarOpen(true);
-      setMarkerCoordinates({ lat, lng });
+      setSelectedMarker(data);
     };
 
     const closeSidebar = () => {
@@ -134,11 +134,14 @@ import DraggableMarker from './customMarker';
         {sidebarOpen && (
       <div className="sidebar">
         <button className="close-button" onClick={closeSidebar}>Close</button>
-        {markerCoordinates && (
+        {selectedMarker && (
           <div>
             <h3>Marker Coordinates</h3>
-            <p>Latitude: {markerCoordinates.lat}</p>
-            <p>Longitude: {markerCoordinates.lng}</p>
+            <p>Latitude: {selectedMarker.center[0]}</p>
+            <p>Longitude: {selectedMarker.center[1]}</p>
+            <p>Name: {selectedMarker.name}</p>
+            <p>Rating: {generateStarRating(selectedMarker.rating)}</p>
+            
           </div>
         )}
       </div>
@@ -146,8 +149,8 @@ import DraggableMarker from './customMarker';
         <MapContainer center={[14.586598,120.976342]} zoom={20} style={{ height: '900px', width: '100%' }}>
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         <MyComponent />
-        <DraggableMarker center={[14.58659, 120.97634]} onMarkerClick={handleMarkerClick}  />
-        <DraggableMarker center={[14.58659, 120.9763]} onMarkerClick={handleMarkerClick}  />
+        <ReviewMarker data={{center: [14.58659, 120.97634], name: "PLM", rating: 5}} onMarkerClick={handleMarkerClick}  />
+        <ReviewMarker data={{center: [14.5865933, 120.9763411], name: "UAC", rating: 3}} onMarkerClick={handleMarkerClick}  />
         {markers.map((marker) => (
             <Marker key={marker.lat + marker.lng} position={[marker.lat, marker.lng]} icon = {myIcon}>
             <Popup>
@@ -164,6 +167,31 @@ import DraggableMarker from './customMarker';
         
     );
     }
+
+    function generateStarRating(rating) {
+      if (isNaN(rating) || rating < 0 || rating > 5) {
+        return 'Invalid rating value.';
+      }
+
+      const fullStar = '★';
+      const emptyStar = '☆';
+      let starString = '';
+
+      for (let i = 0; i < Math.floor(rating); i++) {
+        starString += fullStar;
+      }
+
+      const decimalPart = rating - Math.floor(rating);
+      if (decimalPart > 0) {
+        starString += fullStar.slice(0, 1); // Add half star if needed
+      }
+
+      for (let i = Math.floor(rating) + (decimalPart > 0 ? 1 : 0); i < 5; i++) {
+        starString += emptyStar;
+      }
+
+      return starString;
+    };
 
     
     
