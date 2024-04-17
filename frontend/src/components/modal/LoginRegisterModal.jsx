@@ -1,12 +1,21 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import BACKEND_URL from '../../config.js';
+import BACKEND_URL from '../../../config.js';
+import { Modal, Button, Form, FloatingLabel, ModalBody, ModalHeader } from 'react-bootstrap';
+import "./modal.css"
+
+
+// Brand Utilities
+import brandname from "/logo/brandname.png";
+import logo from "/logo/logo.png";
+import brandnamelogo from "/logo/brandnamelogo.png";
 
 // import { onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
 // import { auth, db } from '../../../firebase/firebase';
 
 const LoginRegisterModal = () => {
 	const [showLogin, setShowLogin] = useState(true);
+    const [showRegister, setShowRegister] = useState(true);
 	const [showPassword, setShowPassword] = useState(false);
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
@@ -152,10 +161,24 @@ const LoginRegisterModal = () => {
         } catch( error ) {
             console.error('Error retrieving user data:', error);
         }
-    };   
+    }
+
+    const handleLoginClose = () => setShowLogin(false);
+    const handleLoginShow = () => setShowLogin(true);
+
+    const handleRegisterClose = () => setShowRegister(false);
+    const handleRegisterShow = () => setShowRegister(true);
 
     return (
-    <div>
+    <>
+    <Button variant="primary" onClick={handleLoginShow}>
+     Login
+    </Button>
+    <Button variant="outline-primary" onClick={handleRegisterShow}>
+     Sign Up
+    </Button>
+
+    <Modal show={showLogin} onHide={handleLoginShow} centered>
         {isLoggedIn && userData && userData.username && (
         <div className="logout-section">
             <p>Welcome, {userData.username}</p>
@@ -165,76 +188,77 @@ const LoginRegisterModal = () => {
 
         {!isLoggedIn && (
             <>
-            <button onClick={() => setShowLogin(true)}>Login</button>
-            <button onClick={() => setShowLogin(false)}>Register</button>
-
             {showLogin ? (
-                <div className="login-modal">
-                    <h2>Login</h2>
-                    <input
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                <div className="password-input">
-                    <input
-                        type={showPassword ? 'text' : 'password'}
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-                    <button onClick={() => setShowPassword(!showPassword)}>
-                        {showPassword ? 'Hide' : 'Show'}
-                    </button>
-                </div>
-                    <button onClick={handleLogin}>Login</button>
-                </div>
-            ) : (
-                <div className="register-modal">
-                    <h2>Register</h2>
-                    <input
-                        type="text"
-                        placeholder="Username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                    />
-                    <input
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                    <div className="password-input">
-                        <input
-                            type={showPassword ? 'text' : 'password'}
-                            placeholder="Password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                        <button onClick={() => setShowPassword(!showPassword)}>
-                            {showPassword ? 'Hide' : 'Show'}
-                        </button>
-                    </div>
-                        <input
-                            type="password"
-                            placeholder="Confirm Password"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                        />
-                        <input
-                            type="date"
-                            placeholder="Birthday"
-                            value={birthday}
-                            onChange={(e) => setBirthday(e.target.value)}
-                        />
-                    <button onClick={handleRegister}>Register</button>
-                </div>
-            )}
-            </>
-        )}
+    <div className="login-modal">
+
+        <ModalHeader className="d-flex justify-content-center align-items-center">
+            <img id="logo" src={logo} alt="" />
+            <img id="brandname" src={brandname} alt="" />
+        </ModalHeader>
+
+        <ModalBody>
+            <Modal.Title className='pb-3'>Login your account</Modal.Title>
+            <FloatingLabel controlId="floatingInput" label="Email address" className="mb-3" >
+                <Form.Control  type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@example.com" /> 
+            </FloatingLabel>
+
+      <FloatingLabel controlId="floatingPassword" label="Password">
+        <Form.Control type={showPassword ? 'text' : 'password'}  value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" />
+        <button className="show-button" onClick={() => setShowPassword(!showPassword)}>
+                        {showPassword ? 'Hide' : 'Show'} </button>
+      </FloatingLabel>
+
+      </ModalBody>
+    
     </div>
-    );
-};
+            ):(<div></div>)}
+        <Modal.Footer className="d-flex justify-content-center align-items-center">
+          <Button variant="primary" className="px-3" onClick={handleLoginClose}>Login</Button>
+        </Modal.Footer>
+        </>
+            
+        )}  
+ 
+    </Modal>
+
+    <Modal show={showRegister} onHide={handleRegisterShow} centered>
+    <>
+        <ModalHeader className="d-flex justify-content-center align-items-center">
+            <img id="logo" src={logo} alt="" />
+            <img id="brandname" src={brandname} alt="" />
+        </ModalHeader>
+        <ModalBody>
+                <Modal.Title className='pb-3'>Register an account</Modal.Title>
+                <FloatingLabel controlId="floatingInput" label="Username" className="mb-3">
+                    <Form.Control type="text" placeholder="accessabilityuser" value={username} onChange={(e) => setUsername(e.target.value)}/>
+                </FloatingLabel>
+
+                <FloatingLabel controlId="floatingInput" label="Email address" className="mb-3">
+                    <Form.Control type="email" placeholder="name@example.com" value={email} onChange={(e) => setEmail(e.target.value)}/>
+                </FloatingLabel>
+
+                <FloatingLabel controlId="floatingPassword" label="Password" className="mb-3">
+                    <Form.Control type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}/>
+                    <button className="show-button" onClick={() => setShowPassword(!showPassword)}>
+                        {showPassword ? 'Hide' : 'Show'} </button>
+                </FloatingLabel>
+
+                <FloatingLabel controlId="floatingPassword" label="Confirm Password" className="mb-3">
+                    <Form.Control type="password" placeholder="Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}/>
+                    <button className="show-button" onClick={() => setShowPassword(!showPassword)}>
+                        {showPassword ? 'Hide' : 'Show'} </button>
+                </FloatingLabel>
+              </ModalBody>
+            </>
+        <Modal.Footer className="d-flex justify-content-center align-items-center">
+          <Button variant="primary" className="px-3" onClick={handleRegisterClose}>
+            Register
+          </Button>
+        </Modal.Footer>
+    </Modal>
+
+
+    </>
+    )};
 
 export default LoginRegisterModal;

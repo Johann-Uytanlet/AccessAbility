@@ -1,0 +1,49 @@
+
+#logo{
+    width: 50px;
+}
+
+#brandname{
+    width: 300px;
+}
+
+.ModalHeader {
+    text-align: center;
+}
+
+.show-button{
+    position: absolute;
+    top: 50%; /* Adjust as needed */
+    right: 10px; /* Adjust as needed */
+    transform: translateY(-50%);
+    color: rgb(146, 146, 146);
+}
+
+/* Apply Bootstrap form control styling to input */
+.input-date {
+    width: 100%;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+/* Adjust height for better appearance */
+.input-date::-webkit-inner-spin-button,
+.input-date::-webkit-outer-spin-button {
+    height: auto;
+}
+
+/* Styling for focus state */
+.input-date:focus {
+    color: #495057;
+    background-color: #fff;
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
