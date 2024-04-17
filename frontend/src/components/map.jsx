@@ -20,17 +20,38 @@ function MapComponent() {
     });
 
     useEffect(() => {
-      setMarkers(fetchMarkers());
-    }, []);
+      console.log("before fetch");
+      const fetchingData = async () =>{
+        try{
+          await fetchMarkers();
+          console.log("markers");
+          console.log(markers);
+        } catch (err) {
+          console.log(err);
+        }
+      }
+      fetchingData();
+      //console.log("marker");
+      //fetchMarkers();
+      //console.log(markers);
+      //setMarkers(fetchMarkers());
+      console.log("after fecth");
+    }
+    
+    , []);
 
     const fetchMarkers = async () => {
+      console.log("before getallmarkers");
       try {
+        console.log("before getallmarkers");
           const response = await fetch(`${BACKEND_URL}/getAllMarkers`, {
               method: 'GET',
               headers: { 'Content-Type': 'application/json' }
           });
           if( response.ok ) {
+            console.log("waiting for data");
             const data = await response.json();
+            console.log(data);
             setMarkers(data);
           } else {
             const errorData = await response.json();
@@ -69,7 +90,9 @@ function MapComponent() {
     };
 
     function MyMarkers({ markers }) {
+      console.log(markers);
       return (
+        
         <>
           {markers.map((marker, index) => (
             <ReviewMarker key={index} data={marker} onMarkerClick={handleMarkerClick} />
@@ -79,8 +102,11 @@ function MapComponent() {
     }
 
     function generateStarRating(rating) {
-      if (isNaN(rating) || rating < 0 || rating > 5) {
+      if (rating < 0 || rating > 5) {
         return 'Invalid rating value.';
+      }
+      else if(isNaN(rating)){
+        return 'No ratings yet, please add one'
       }
 
       const fullStar = '★';
@@ -105,7 +131,7 @@ function MapComponent() {
 
     function MyComponent() {
         const map = useMapEvents({
-          click: (e) => {
+          click: async (e) => {
             const { lat, lng } = e.latlng;
             const name = prompt(
                 'What is the name of the Building?'
@@ -125,7 +151,14 @@ function MapComponent() {
                     rating,
                   };
 
-                  createMarker(name, lat, lng);
+                  try {
+                    await createMarker(name, lat, lng);
+                    // If createMarker succeeds, you can do further operations here
+                    // For example, updating state or showing a message
+                  } catch (error) {
+                    console.error('Error creating marker:', error);
+                    // Handle error accordingly, e.g., show an error message to the user
+                  }
                   // setMarkers(prevMarkers => [...prevMarkers, newMarker]);
                   // `name: ${name}, rating: ${rating}, comment: ${comment}`
                   //L.marker([lat, lng], { icon: myIcon }).addTo(map).bindPopup(customPopup, customOptions).openPopup();
@@ -158,8 +191,9 @@ function MapComponent() {
             <h3>Marker Coordinates</h3>
             <p>Latitude: {selectedMarker.lat}</p>
             <p>Longitude: {selectedMarker.lng}</p>
-            <p>Name: {selectedMarker.name}</p>
+            <p>Name: {selectedMarker.location}</p>
             <p>Rating: {generateStarRating(selectedMarker.rating)}</p>
+            
             
           </div>
         )}

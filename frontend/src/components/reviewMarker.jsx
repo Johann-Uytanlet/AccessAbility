@@ -1,17 +1,23 @@
 import React, { useState, useMemo, useCallback, useRef } from 'react';
 import { Marker, Popup } from 'react-leaflet';
 import tryIcon from '../assets/try.png'; 
+//import notFriendly from '../assets/notfriendly.png'; 
+//import partially from '../assets/partially.png'; 
+//import friendly from '../assets/friendly.png'; 
+
 
 function reviewMarker({ data, onMarkerClick }) {
     const markerRef = useRef(null);
-    const center = data.center;
+    const lat = data.lat;
+    const lng = data.lng;
+    //const center = data.center;
     const name = data.name;
     const rating = data.rating;
 
     const icon = useMemo(
         () =>
           new L.Icon({
-            iconUrl: tryIcon, // Set the icon URL to your tryIcon
+            iconUrl: tryIcon,
             iconSize: [50, 50], // Set the icon size
             popupAnchor: [0, -25], // Adjust the popup anchor position
           }),
@@ -22,7 +28,7 @@ function reviewMarker({ data, onMarkerClick }) {
     () => ({
       click: () => {
         // Call your function to handle sidebar opening for the draggable marker
-        console.log(center[0], center[1]);
+        console.log(lat, lng);
         onMarkerClick(data);
       },
     }),
@@ -34,7 +40,7 @@ function reviewMarker({ data, onMarkerClick }) {
     <Marker
       eventHandlers={eventHandlers}
       icon={icon} 
-      position={center}
+      position={[lat, lng]}
       ref={markerRef}>
       <Popup minWidth={90}>
         <span>
@@ -46,8 +52,11 @@ function reviewMarker({ data, onMarkerClick }) {
 }
 
 function generateStarRating(rating) {
-    if (isNaN(rating) || rating < 0 || rating > 5) {
+    if (rating < 0 || rating > 5) {
       return 'Invalid rating value.';
+    }
+    else if(isNaN(rating)){
+      return 'No ratings yet, please add one'
     }
 
     const fullStar = '★';
