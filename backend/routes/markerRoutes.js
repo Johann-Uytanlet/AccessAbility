@@ -6,11 +6,33 @@ const router = express.Router();
 
 router.post('/', async (req, res) => {
   try {
-    const { name, latlng, rating, ratingCounts, numberOfRaters, comments } = req.body;
+    const { name, rating, comments, latlng } = req.body;
 
-    if( !name || !latlng || !rating || !ratingCounts || !numberOfRaters || !comments ) {
+    if( !name || !latlng || !rating) {
       return res.status(400).send({ message: 'Send all required fields' });
     }
+
+    let ratingCounts = [0, 0, 0, 0, 0];
+    switch (rating) {
+      case 1:
+        ratingCounts[0] = 1;
+        break;
+      case 2:
+        ratingCounts[1] = 1;
+        break;
+      case 3:
+        ratingCounts[2] = 1;
+        break;
+      case 4:
+        ratingCounts[3] = 1;
+        break;
+      case 5:
+        ratingCounts[4] = 1;
+        break;
+    }
+
+
+    const numberOfRaters = 1
 
     const newMarker = { name, latlng, rating, ratingCounts, numberOfRaters, comments };
     const docRef = await addDoc(collection(db, 'markers'), newMarker);

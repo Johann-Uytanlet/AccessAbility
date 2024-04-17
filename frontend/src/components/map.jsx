@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-    import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
+    import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
     import "leaflet/dist/leaflet.css";
     import L, {Icon, icon} from 'leaflet';
     import tryIcon from '../assets/try.png'; 
+    import axios from 'axios';
 
     function MapComponent() {
     const [markers, setMarkers] = useState([]); // Array to store marker data
@@ -13,37 +14,65 @@ import React, { useState, useEffect } from 'react';
     
       iconSize: [50, 50],
     
-      //iconAnchor: [12.5, 41],
-    
       popupAnchor: [0, -41],
     
     });
+    
+
+    const handleAddMarker = (name, rating, comment, latlng) => {
+      const data = {
+        name,
+        rating,
+        comment,
+        latlng
+      };
+      /*
+      axios
+        .post('http://localhost:5555/marker', data)
+        .then(() => {
+          setLoading(false);
+          enqueueSnackbar('Book Created successfully', { variant: 'success' });
+          navigate('/');
+        })
+        .catch((error) => {
+          // alert('An error happened. Please Chack console');
+          enqueueSnackbar('Error', { variant: 'error' });
+          console.log(error);
+        });*/
+    };
 
     function MyComponent() {
         const map = useMapEvents({
           click: (e) => {
             const { lat, lng } = e.latlng;
-            const response = prompt(
-                'Enter details for the new marker (separate details with commas):\nName, Rating (0-5), Comment'
-              );
+            const name = prompt(
+                'What is the name of the Building?'
+            );
+            
+            
         
-              if (response) {
-                const [name, rating, comment] = response.split(','); // Split user input
-        
-                // Validate input (optional)
-                // You can add checks for valid name format, rating within range (0-5), and comment length
+              if (name) {
+                let rating;
+                do {
+                  rating = prompt('What is your Rating (0-5)');
+                  rating = parseFloat(rating);
+                } while (isNaN(rating) || rating < 0 || rating > 5);
+                
+                
+                  var customPopup = `<b>name</b>: ${name}<br/> <b>rating</b>: ${rating}<br/>`;
 
-                var customPopup = `<b>name</b>: ${name}<br/> <b>rating</b>: ${rating}<br/> <b>comment</b>: ${comment}<br/>`;
-
-                // specify popup options 
-                var customOptions =
-                    {
-                    'maxWidth': '400',
-                    'width': '200',
-                    'className' : 'popupCustom'
-                    }
-                // `name: ${name}, rating: ${rating}, comment: ${comment}`
-                L.marker([lat, lng], { icon: myIcon }).addTo(map).bindPopup(customPopup, customOptions).openPopup();;
+                  // specify popup options 
+                  var customOptions =
+                      {
+                      'maxWidth': '400',
+                      'width': '200',
+                      'className' : 'popupCustom'
+                      }
+                  // `name: ${name}, rating: ${rating}, comment: ${comment}`
+                  L.marker([lat, lng], { icon: myIcon }).addTo(map).bindPopup(customPopup, customOptions).openPopup();
+                  handleAddMarker(name, rating, comment, [lat, lng])
+                
+                
               }
           }
         });
@@ -63,6 +92,7 @@ import React, { useState, useEffect } from 'react';
     
 
     return (
+      <div>
         <MapContainer center={[14.586598,120.976342]} zoom={20} style={{ height: '900px', width: '100%' }}>
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         <MyComponent />
@@ -72,6 +102,8 @@ import React, { useState, useEffect } from 'react';
             </Marker>
         ))}
         </MapContainer>
+      </div>
+        
     );
 
     }
