@@ -7,7 +7,6 @@ import React, { useState, useEffect } from 'react';
 
     function MapComponent() {
     const [markers, setMarkers] = useState([]); // Array to store marker data
-
     const myIcon = new Icon({
 
       iconUrl: tryIcon,
@@ -85,20 +84,22 @@ import React, { useState, useEffect } from 'react';
                 
                 
                   let starString = generateStarRating(rating);
-                  var customPopup = `<b>name</b>: ${name}<br/> <b>rating</b>: ${starString}<br/>`;
+                  var customPopup = `<div>
+                                      <b>Name</b>: ${name}<br />
+                                      <b>Rating</b>: ${starString}<br />
+                                      </div>`;
 
                   // specify popup options 
                   var customOptions =
                       {
-                      'maxWidth': '400',
-                      'width': '200',
+                      'fontSize': '30px',
+                      'maxWidth': '800',
+                      'width': '500',
                       'className' : 'popupCustom'
                       }
                   // `name: ${name}, rating: ${rating}, comment: ${comment}`
                   L.marker([lat, lng], { icon: myIcon }).addTo(map).bindPopup(customPopup, customOptions).openPopup();
-                  handleAddMarker(name, rating, comment, [lat, lng])
-                
-                
+                  //handleAddMarker(name, rating, comment, [lat, lng])
               }
           }
         });
@@ -108,14 +109,12 @@ import React, { useState, useEffect } from 'react';
     useEffect(() => {
         // Replace with your actual marker data
         const initialMarkers = [
-            { lat: 14.586598, lng: 120.976342, popupContent: 'London' },
-            { lat: 14.5865, lng: 120.9763, popupContent: 'Paris' },
+            { lat: 14.586598, lng: 120.976342, name: "UAC", rating: "★★★★★" },
+            { lat: 14.5865, lng: 120.9763, name: "PLM", rating: "★★★★★" },
         // Add more markers here
         ];
         setMarkers(initialMarkers);
     }, []);
-
-    
 
     return (
       <div>
@@ -124,13 +123,17 @@ import React, { useState, useEffect } from 'react';
         <MyComponent />
         {markers.map((marker) => (
             <Marker key={marker.lat + marker.lng} position={[marker.lat, marker.lng]} icon = {myIcon}>
-            <Popup>{marker.popupContent}</Popup>
+            <Popup>
+                        <div style={{ fontSize: '20px' }}>
+                            <strong>Name:</strong> {marker.name}<br />
+                            <strong>Rating:</strong> {marker.rating}<br />
+                        </div></Popup>
             </Marker>
         ))}
         </MapContainer>
       </div>
         
     );
-
     }
+    
     export default MapComponent;
