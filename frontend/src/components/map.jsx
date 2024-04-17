@@ -6,13 +6,17 @@ import tryIcon from '../assets/try.png';
 import BACKEND_URL from '../../config.js';
 import MarkerDetails from './MarkerDetails.jsx';
 import MarkerReviewer from './MarkerReviewer.jsx';
+import DraggableMarker from './customMarker';
+import ReviewMarker from './reviewMarker';
 
 function MapComponent() {
 
   /*************************************************************** 
                             Variables
   ***************************************************************/
-  const [markers, setMarkers] = useState([]);
+  const [markers, setMarkers] = useState([]); // Array to store marker data
+  const [selectedMarker, setSelectedMarker] = useState(null); // State to store selected marker
+  const [sidebarOpen, setSidebarOpen] = useState(false); // State to manage sidebar visibility
 
   const myIcon = new Icon({
     iconUrl: tryIcon,
@@ -130,79 +134,177 @@ function MapComponent() {
         }
       },
     });
+    
 
-    return null;
-  }
+    const handleAddMarker = (name, rating, comment, latlng) => {
+      const data = {
+        name,
+        rating,
+        comment,
+        latlng
+      };
+      /*
+      axios
+        .post('http://localhost:5555/marker', data)
+        .then(() => {
+          setLoading(false);
+          enqueueSnackbar('Book Created successfully', { variant: 'success' });
+          navigate('/');
+        })
+        .catch((error) => {
+          // alert('An error happened. Please Chack console');
+          enqueueSnackbar('Error', { variant: 'error' });
+          console.log(error);
+        });*/
+    };
 
-  /*************************************************************** 
-                            Variables
-  ***************************************************************/
-  const [selectedMarker, setSelectedMarker] = useState(null);
-  const [showMarkerDetails, setShowMarkerDetails] = useState(false);
-  const [showMarkerReviewer, setShowMarkerReviewer] = useState(false);
+    function generateStarRating(rating) {
+      if (isNaN(rating) || rating < 0 || rating > 5) {
+        return 'Invalid rating value.';
+      }
 
-  const handleMarkerClick = (marker) => {
-    setSelectedMarker(marker);
-    setShowMarkerDetails(true);
-  };
+      const fullStar = '★';
+      const emptyStar = '☆';
+      let starString = '';
 
-  const handleMarkerDetailsClose = () => {
-    setSelectedMarker(null);
-    setShowMarkerDetails(false);
-  };
+      for (let i = 0; i < Math.floor(rating); i++) {
+        starString += fullStar;
+      }
 
-  const handleReviewLocationClick = () => {
-    setShowMarkerDetails(false);
-    setShowMarkerReviewer(true);
-  };
+      const decimalPart = rating - Math.floor(rating);
+      if (decimalPart > 0) {
+        starString += fullStar.slice(0, 1); // Add half star if needed
+      }
 
-  const handleMarkerReviewSubmit = async (rating, comment) => {
-    if (selectedMarker) {
-      await createMarkerReview(selectedMarker.id, rating, comment);
-      setSelectedMarker(null);
-      setShowMarkerReviewer(false);
-    }
-  };
+      for (let i = Math.floor(rating) + (decimalPart > 0 ? 1 : 0); i < 5; i++) {
+        starString += emptyStar;
+      }
 
-  useEffect(() => {
-    fetchMarkers();
-  }, []);
+      return starString;
+    };
 
-  return (
-    <div>
-      <MapContainer center={[14.586598, 120.976342]} zoom={20} style={{ height: '900px', width: '100%' }}>
+    function MyComponent() {
+        const map = useMapEvents({
+          click: (e) => {
+            const { lat, lng } = e.latlng;
+            const name = prompt(
+                'What is the name of the Building?'
+            );     
+              if (name) {
+                let rating;
+                do {
+                  rating = prompt('What is your Rating (0-5)');
+                  rating = parseFloat(rating);
+                } while (isNaN(rating) || rating < 0 || rating > 5);
+                
+                
+                  let starString = generateStarRating(rating);
+                  var customPopup = `<div>
+                                      <b>Name</b>: ${name}<br />
+                                      <b>Rating</b>: ${starString}<br />
+                                      </div>`;
+
+                  // specify popup options 
+                  var customOptions =
+                      {
+                      'fontSize': '30px',
+                      'maxWidth': '800',
+                      'width': '500',
+                      'className' : 'popupCustom'
+                      }
+                  // `name: ${name}, rating: ${rating}, comment: ${comment}`
+                  L.marker([lat, lng], { icon: myIcon }).addTo(map).bindPopup(customPopup, customOptions).openPopup();
+                  //handleAddMarker(name, rating, comment, [lat, lng])
+              }
+          }
+        });
+        return null;
+      }
+
+    useEffect(() => {
+        // Replace with your actual marker data
+        const initialMarkers = [
+            { lat: 14.586598, lng: 120.976342, name: "UAC", rating: "★★★★★" },
+            { lat: 14.5865, lng: 120.9763, name: "PLM", rating: "★★★★★" },
+        // Add more markers here
+        ];
+        setMarkers(initialMarkers);
+    }, []);
+
+    const handleMarkerClick = (data) => {
+      console.log("Here");
+      setSidebarOpen(true);
+      setSelectedMarker(data);
+    };
+
+    const closeSidebar = () => {
+      setSidebarOpen(false);
+    };
+
+    return (
+      <div style={{ display: 'flex', height: '100vh' }}>
+        {sidebarOpen && (
+      <div className="sidebar">
+        <button className="close-button" onClick={closeSidebar}>Close</button>
+        {selectedMarker && (
+          <div>
+            <h3>Marker Coordinates</h3>
+            <p>Latitude: {selectedMarker.center[0]}</p>
+            <p>Longitude: {selectedMarker.center[1]}</p>
+            <p>Name: {selectedMarker.name}</p>
+            <p>Rating: {generateStarRating(selectedMarker.rating)}</p>
+            
+          </div>
+        )}
+      </div>
+    )}
+        <MapContainer center={[14.586598,120.976342]} zoom={20} style={{ height: '900px', width: '100%' }}>
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         <MyComponent />
+        <ReviewMarker data={{center: [14.58659, 120.97634], name: "PLM", rating: 5}} onMarkerClick={handleMarkerClick}  />
+        <ReviewMarker data={{center: [14.5865933, 120.9763411], name: "UAC", rating: 3}} onMarkerClick={handleMarkerClick}  />
         {markers.map((marker) => (
-          <Marker
-            position={[marker.lat, marker.lng]}
-            icon={myIcon}
-            eventHandlers={{
-              click: () => handleMarkerClick(marker),
-            }}
-          >
+            <Marker key={marker.lat + marker.lng} position={[marker.lat, marker.lng]} icon = {myIcon}>
             <Popup>
-              Location: {marker.location}  
-              <br></br>
-              Ratings: {marker.averageRating}
-            
+              <div style={{ fontSize: '20px' }}>
+                  <strong>Name:</strong> {marker.name}<br />
+                  <strong>Rating:</strong> {marker.rating}<br />
+              </div>
             </Popup>
-          </Marker>
+            </Marker>
         ))}
-      </MapContainer>
-      <MarkerDetails
-        marker={selectedMarker}
-        show={showMarkerDetails}
-        onHide={handleMarkerDetailsClose}
-        onReviewClick={handleReviewLocationClick}
-      />
-      <MarkerReviewer
-        show={showMarkerReviewer}
-        onHide={() => setShowMarkerReviewer(false)}
-        onSubmit={handleMarkerReviewSubmit}
-      />
-    </div>
-  );
-}
+        </MapContainer>
+        
+      </div>
+        
+    );
+    }
 
-export default MapComponent;
+    function generateStarRating(rating) {
+      if (isNaN(rating) || rating < 0 || rating > 5) {
+        return 'Invalid rating value.';
+      }
+
+      const fullStar = '★';
+      const emptyStar = '☆';
+      let starString = '';
+
+      for (let i = 0; i < Math.floor(rating); i++) {
+        starString += fullStar;
+      }
+
+      const decimalPart = rating - Math.floor(rating);
+      if (decimalPart > 0) {
+        starString += fullStar.slice(0, 1); // Add half star if needed
+      }
+
+      for (let i = Math.floor(rating) + (decimalPart > 0 ? 1 : 0); i < 5; i++) {
+        starString += emptyStar;
+      }
+
+      return starString;
+    };
+
+    
+    
+    export default MapComponent;
