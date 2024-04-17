@@ -1,10 +1,10 @@
 import { db, auth } from '../firebase/firebase.js';
-import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
-import { collection, addDoc, doc, setDoc } from "firebase/firestore";
+import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { collection, addDoc, doc, setDoc, getDoc } from "firebase/firestore";
 
 const UserRoutes = {
 
-    loginUser: async ( req, res ) => {
+    loginUser: async( req, res ) => {
         try {
             const { email, password } = req.body;
 
@@ -12,14 +12,14 @@ const UserRoutes = {
             const user = userCredential.user;
             const userToken = await user.getIdToken();
 
-            res.status(200).send({ user, userToken });
+            return res.status(200).send({ user, userToken });
         } catch( error ) {
             console.log(error.message);
-            res.status(401).send({ message: 'Invalid email or password' });
+            return res.status(401).send({ message: 'Invalid email or password' });
         }
     },
 
-    registerUser: async ( req, res ) => {
+    registerUser: async( req, res ) => {
         try {
             const { username, birthday, email, password } = req.body;
     
@@ -35,12 +35,58 @@ const UserRoutes = {
                 birthday: birthday,
             });
     
-            res.status(201).send({ message: 'Registration successful' });
+            return res.status(201).send({ message: 'Registration successful' });
         } catch( error ) {
             console.log(error.message);
-            res.status(500).send({ message: `${error.message}` });
+            return res.status(500).send({ message: `${error.message}` });
         }
-      }
+    },
+
+    logoutUser: async( req, res ) => {
+        try {
+            signOut(auth)
+            return res.status(201).send({ message: 'Logout successful' });
+        } catch( error ) {
+            console.log(error.message);
+            return res.status(500).send({ message: `${error.message}` });
+        }
+    },
+
+    getUserData: async( req, res ) => {
+        try {
+            const user = auth.currentUser;
+            if( !user ) {
+                return res.status(400).send({ message: "User not found." })
+            }
+
+            const userRef = doc( db, 'users', user.uid );
+            const docSnap = await getDoc(userRef);
+
+            if( docSnap.exists() ) {
+                return res.status(200).send({ user: docSnap.data() });
+            } else {
+                return res.status(400).send({ message: "User not found." })
+            }
+
+        } catch( error ) {
+            console.log(error.message);
+            return res.status(500).send({ message: `${error.message}` });
+        }
+    },
+
+    checkLoginStatus: async (req, res) => {
+        try {
+            const user = auth.currentUser;
+            if( user ) {
+                return res.status(200).json({ loggedIn: true, user: user.email });
+            } else {
+                return res.status(200).json({ loggedIn: false });
+            }
+        } catch( error ) {
+            console.error('Error in checkLogin:', error);
+            return res.status(500).json({ message: "Internal server error." });
+        }
+    }
 }
   
 export default UserRoutes;
