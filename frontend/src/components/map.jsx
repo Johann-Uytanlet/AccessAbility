@@ -6,11 +6,13 @@ import tryIcon from '../assets/try.png';
 import DraggableMarker from './customMarker';
 import ReviewMarker from './reviewMarker';
 import BACKEND_URL from '../../config.js';
+import MarkerDetails from './MarkerDetails/MarkerDetails'
 
 function MapComponent() {
     const [markers, setMarkers] = useState([]); // Array to store marker data
     const [selectedMarker, setSelectedMarker] = useState(null); // State to store selected marker
     const [sidebarOpen, setSidebarOpen] = useState(false); // State to manage sidebar visibility
+    const [showMarkerDetails, setShowMarkerDetails] = useState(false);
 
     useEffect(() => {
       const fetchingData = async () =>{
@@ -116,10 +118,14 @@ function MapComponent() {
 				const name = prompt('What is the name of the building?');     
 				const { lat, lng } = e.latlng;
 
-				try {
+        if( !name || name == '' || name == undefined ) {
+          return null;
+        } 
+
+				try { 
 					await createMarker(name, lat, lng);				
 				} catch( error ) {
-					console.log("Marker creation failed")
+					console.log( "Marker creation failed")
 				}
 			}
         });
@@ -127,32 +133,22 @@ function MapComponent() {
     }
 
     const handleMarkerClick = (data) => {
-      console.log("Here");
-      setSidebarOpen(true);
       setSelectedMarker(data);
+      setShowMarkerDetails(true);
+    };
+  
+    const closeMarkerDetails = () => {
+      setShowMarkerDetails(false);
     };
 
-    const closeSidebar = () => {
-      setSidebarOpen(false);
-    };
-
+    
     return (
       <div style={{ display: 'flex', height: '100vh' }}>
-        {sidebarOpen && (
-      <div className="sidebar">
-        <button className="close-button" onClick={closeSidebar}>Close</button>
-        {selectedMarker && (
-          <div>
-            <h3>Marker Coordinates</h3>
-            <p>Latitude: {selectedMarker.lat}</p>
-            <p>Longitude: {selectedMarker.lng}</p>
-            <p>Name: {selectedMarker.location}</p>
-            <p>Rating: {generateStarRating(selectedMarker.rating)}</p>
-            
+        {showMarkerDetails && (
+          <div className="marker-details-container">
+            <MarkerDetails markerData={selectedMarker} onClose={closeMarkerDetails} generateStarRating={generateStarRating} />
           </div>
         )}
-      </div>
-    )}
         <MapContainer center={[14.586598,120.976342]} zoom={20} style={{ height: '900px', width: '100%' }}>
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         <MyComponent />

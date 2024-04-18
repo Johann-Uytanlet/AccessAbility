@@ -1,6 +1,7 @@
 import express from 'express';
 import MarkerRoutes from '../backend/routes/markerRoutes.js'
 import UserRoutes from '../backend/routes/userRoutes.js'
+import ReviewRoutes from '../backend/routes/reviewRoutes.js'
 
 const router = express.Router();
 
@@ -11,10 +12,14 @@ router.post( '/login', UserRoutes.loginUser )
 router.post( '/register', UserRoutes.registerUser )
 router.post( '/logout', UserRoutes.logoutUser )
 
-// - MarkerRoutes
+// - Marker Routes
 router.get( '/getAllMarkers', MarkerRoutes.getAllMarkers );
 router.get( '/getMarkerReviews', MarkerRoutes.getMarkerReviews );
 router.post( '/createMarker', MarkerRoutes.createMarker );
 router.post( '/createMarkerReview', MarkerRoutes.createMarkerReview )
+
+// - Review Routes
+router.get( '/getAllMarkerReviews', ReviewRoutes.getAllMarkerReviews );
+router.post( '/createMarkerReview', ReviewRoutes.createMarkerReview );
 
 export default router;
