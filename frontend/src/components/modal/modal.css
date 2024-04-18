@@ -1,3 +1,10 @@
+.modal {
+    z-index: 1050;
+}
+  
+.modal-content {
+    z-index: 1060;
+}
 
 #logo{
     width: 50px;

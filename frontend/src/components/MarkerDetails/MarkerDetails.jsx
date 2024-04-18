@@ -31,7 +31,7 @@ const MarkerDetails = ({ marker, onClose, generateStarRating }) => {
 		const updateMarker = async () => {
 			try {
 				setMarkerData(marker);
-				await updateAllAverageelement();
+				await updateAllAverageRatings();
 			} catch( error ) {
 				console.log( "useEffect Error: updateMarker() failed" );
 			}
@@ -42,8 +42,9 @@ const MarkerDetails = ({ marker, onClose, generateStarRating }) => {
 	useEffect(() => {
 		const fetchMarkerReviews = async () => {
 		  	try {
-				await updateAllAverageelement();
+				await updateAllAverageRatings();
 				await retrieveAllMarkerReviews();
+				setRating(0)
 		  	} catch( error ) {
 				console.log( "useEffect Error: fetchMarkerReviews() failed" );
 			}
@@ -143,9 +144,9 @@ const MarkerDetails = ({ marker, onClose, generateStarRating }) => {
 		}
 	}
 
-	async function updateAllAverageelement() {
+	async function updateAllAverageRatings() {
 		try {
-			const response = await fetch(`${BACKEND_URL}/updateAllAverageelement`, {
+			const response = await fetch(`${BACKEND_URL}/updateAllAverageRatings`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 			});

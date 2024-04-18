@@ -31,6 +31,7 @@ function MapComponent() {
     useEffect(() => {
 		const fetchingData = async () =>{
 			try {
+				await updateAllAverageRatings();
 				await retrieveAllMarkers();
 			} catch (err) {
 				console.log(err);
@@ -119,6 +120,29 @@ function MapComponent() {
 			console.error('Error creating marker:', error);
 		}
 	};
+
+	
+	async function updateAllAverageRatings() {
+		try {
+			const response = await fetch(`${BACKEND_URL}/updateAllAverageRatings`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+			});
+	
+			if (response.ok) {
+				const data = await response.json();
+				console.log(data.message);
+				// - Optionally, you can reload the marker data or perform any other necessary actions
+			} else {
+				const errorData = await response.json();
+				console.error('Error updating average element:', errorData.message);
+				// - Handle the error scenario, such as displaying an error message to the user
+			}
+		} catch (error) {
+			console.error('Error updating average element:', error);
+			// - Handle any network or other errors that may occur
+		}
+	}
 
 	/*|**********************************************
 					 Utility Functions

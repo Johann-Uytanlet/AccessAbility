@@ -61,15 +61,17 @@ const RegisterModal = ({ showRegister, handleRegisterClose }) => {
                     </FloatingLabel>
 
                     <FloatingLabel controlId="floatingPassword" label="Password" className="mb-3">
-                        <Form.Control type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                        <Form.Control type={showPassword ? 'text' : 'password'} placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
                         <button className="show-button" onClick={() => setShowPassword(!showPassword)}>
-                            {showPassword ? 'Hide' : 'Show'} </button>
+                            {showPassword ? 'Hide' : 'Show'}
+                        </button>
                     </FloatingLabel>
 
-                    <FloatingLabel controlId="floatingPassword" label="Confirm Password" className="mb-3">
-                        <Form.Control type="password" placeholder="Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+                    <FloatingLabel controlId="floatingConfirmPassword" label="Confirm Password" className="mb-3">
+                        <Form.Control type={showPassword ? 'text' : 'password'} placeholder="Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
                         <button className="show-button" onClick={() => setShowPassword(!showPassword)}>
-                            {showPassword ? 'Hide' : 'Show'} </button>
+                            {showPassword ? 'Hide' : 'Show'}
+                        </button>
                     </FloatingLabel>
                 </ModalBody>
             </>
@@ -77,7 +79,7 @@ const RegisterModal = ({ showRegister, handleRegisterClose }) => {
                 <Button variant="primary" className="px-3" onClick={handleRegister}>
                     Register
                 </Button>
-                <Button variant="primary" className="px-3" onClick={handleRegisterClose}>
+                <Button variant="secondary" style={{ backgroundColor: '#8A8A8A' }} className="px-3" onClick={handleRegisterClose}>
                     Close
                 </Button>
             </Modal.Footer>
