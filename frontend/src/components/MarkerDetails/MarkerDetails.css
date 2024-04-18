@@ -1,6 +1,6 @@
 .marker-details-container {
     position: absolute;
-    left: 10px; /* Adjust this value to control the horizontal spacing from the left edge */
+    left: 2.5rem; /* Adjust this value to control the horizontal spacing from the left edge */
     top: 50%;
     transform: translateY(-50%); /* This will vertically center the container */
     z-index: 1000;
@@ -87,6 +87,10 @@
     height: 31px;
     flex-shrink: 0;
     border-radius: 10px;
+}
+
+.rating-number {
+    user-select: none;
 }
 
 .rating-label {

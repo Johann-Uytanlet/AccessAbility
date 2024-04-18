@@ -10,7 +10,7 @@ function reviewMarker({ data, onMarkerClick }) {
     const lat = data.lat;
     const lng = data.lng;
     //const center = data.center;
-    const name = data.location;
+    const name = data.name;
     const rating = data.rating;
 
     const icon = useMemo(
