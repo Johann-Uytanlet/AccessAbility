@@ -61,15 +61,11 @@ function MapComponent() {
           });
           
           if( response.ok ) {
-              alert("MARKER WAS CREATEED");
               fetchMarkers();
-          } else {
-              alert( `${response.message}`)
           }
-  
+
       } catch(error) {
         console.error('Error creating marker:', error);
-        alert("MARKER WAS NOT CREATED");
       }
     };
 

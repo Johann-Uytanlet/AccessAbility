@@ -11,6 +11,7 @@ const MarkerDetails = ({ markerData, onClose, generateStarRating }) => {
     const [rating, setRating] = useState(0);
 
     const handleRatingClick = (rating) => {
+        markerData.rating = rating;
         console.log(`Rating ${rating} clicked`);
         setRating(rating)
     };
@@ -21,8 +22,8 @@ const MarkerDetails = ({ markerData, onClose, generateStarRating }) => {
             return;
         }
 
-		const form = {
-		};
+        const form = {
+        };
 
         try {
           const response = await fetch( `${BACKEND_URL}/createMarkerReview`, {
@@ -30,10 +31,7 @@ const MarkerDetails = ({ markerData, onClose, generateStarRating }) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(form),
           });
-          alert(response.status);
-          alert(response.message);
         } catch( error ) {
-          alert('Fetch Error')
         }
 
         setCommunityNotes([...communityNotes, comment.trim()]);
@@ -41,7 +39,7 @@ const MarkerDetails = ({ markerData, onClose, generateStarRating }) => {
     };
 
   const getColorByIndex = (index) => {
-    const colors = ["#E43836", "#3F51B5", "#4CAF50", "#FFC107", "#9C27B0"];
+    const colors = [ "#E43836", "#FD674D", "#FFC236", "#4CAF50","#36AE26"];
     return colors[index % colors.length];
   };
 
@@ -69,7 +67,7 @@ const MarkerDetails = ({ markerData, onClose, generateStarRating }) => {
       <div className="marker-details-body">
         <div className="marker-details-body rating">
           <div className='rating-circle'>
-            <h1>{markerData.averageRating}</h1>
+            <h1>{rating}</h1>
           </div>
           {/* TODO: Turn data to dynamic */}
           <h4 className='rating-label'>Friendly</h4>
