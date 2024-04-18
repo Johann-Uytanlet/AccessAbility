@@ -87,7 +87,11 @@
     height: 31px;
     flex-shrink: 0;
     border-radius: 10px;
-    background: #E43836 !important; /* Fix */
+     /* Fix */
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
 }
 
 .rating-label {

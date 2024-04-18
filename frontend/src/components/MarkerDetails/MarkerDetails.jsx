@@ -2,15 +2,13 @@ import React, { useState } from 'react';
 import './MarkerDetails.css';
 import closeIcon from '../../assets/x.svg';
 
-const MarkerDetails = ({ markerData, onClose, generateStarRating }) => {
+const MarkerDetails = ({ markerData, onClose}) => {
   const [comment, setComment] = useState('');
   const [communityNotes, setCommunityNotes] = useState([]);
   const [textAreaClicked, setTextAreaClicked] = useState(false);
   const [cancelClicked, setCancelClicked] = useState(false);
 
-  const handleRatingClick = (rating) => {
-    console.log(`Rating ${rating} clicked`);
-  };
+
 
   const handleCommentSubmit = () => {
     if (comment.trim()) {
@@ -20,7 +18,7 @@ const MarkerDetails = ({ markerData, onClose, generateStarRating }) => {
   };
 
   const getColorByIndex = (index) => {
-    const colors = ["#E43836", "#3F51B5", "#4CAF50", "#FFC107", "#9C27B0"];
+    const colors = [ "#E43836", "#FD674D", "#FFC236", "#4CAF50","#36AE26"];
     return colors[index % colors.length];
   };
 
@@ -32,6 +30,11 @@ const MarkerDetails = ({ markerData, onClose, generateStarRating }) => {
   const handleCancelClick = () => {
     setTextAreaClicked(false);
     setCancelClicked(false);
+  };
+
+  const handleRatingClick = (rating) => {
+    markerData.rating = rating;
+    console.log(`Rating ${rating} clicked`);
   };
 
   return (
@@ -55,7 +58,7 @@ const MarkerDetails = ({ markerData, onClose, generateStarRating }) => {
           <div className="rating-buttons">
             {/* Fix background colors */}
             {[1, 2, 3, 4, 5].map((rating, index) => (
-              <button
+              <button className='value-button'
                 key={rating}
                 onClick={() => handleRatingClick(rating)}
                 style={{ backgroundColor: getColorByIndex(index) }}
