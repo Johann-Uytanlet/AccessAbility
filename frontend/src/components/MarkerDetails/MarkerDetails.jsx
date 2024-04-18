@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './MarkerDetails.css';
 import closeIcon from '../../assets/x.svg';
+import MarkerNote from '../MarkerNote/MarkerNote.jsx'
 import BACKEND_URL from '../../../config.js';
 
 const MarkerDetails = ({ markerData, onClose, generateStarRating }) => {
@@ -88,7 +89,8 @@ const MarkerDetails = ({ markerData, onClose, generateStarRating }) => {
         <div className="community-notes">
           <h4 className="community-notes-header">Community Notes</h4>
           {communityNotes.map((note, index) => (
-            <p key={index}>{note}</p>
+            <MarkerNote username={'user'} comment={note}/>
+            //<p key={index}>{note}</p>
           ))}
         </div>
         <div className="comment-section">
