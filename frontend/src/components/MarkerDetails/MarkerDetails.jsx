@@ -28,17 +28,21 @@ const MarkerDetails = ({ marker, onClose, generateStarRating }) => {
     const [rating, setRating] = useState(0);
 
     useEffect(() => {
-		try {
-			setMarkerData(marker);
-			console.log("markerID:", markerData.markerID);
-		} catch( error ) {
-			console.log( "useEffect Error: setMarkerData() failed" );
+		const updateMarker = async () => {
+			try {
+				setMarkerData(marker);
+				await updateAllAverageelement();
+			} catch( error ) {
+				console.log( "useEffect Error: updateMarker() failed" );
+			}
 		}
+		updateMarker();
     }, [marker]);
 
 	useEffect(() => {
 		const fetchMarkerReviews = async () => {
 		  	try {
+				await updateAllAverageelement();
 				await retrieveAllMarkerReviews();
 		  	} catch( error ) {
 				console.log( "useEffect Error: fetchMarkerReviews() failed" );
@@ -115,6 +119,52 @@ const MarkerDetails = ({ marker, onClose, generateStarRating }) => {
 		}
 	}
 
+	async function updateAverageRating() {
+		try {
+			const form = {
+				markerID: markerData.markerID, 
+			};
+
+			const response = await fetch( `${BACKEND_URL}/updateAverageRating`, {
+				method:'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(form),
+			});
+
+			if( response.ok ) {
+				console.log( "Rating successfully updated:", response.message );
+				retrieveAllMarkerReviews();
+			} else {
+				// - SHOW ERROR MESSAGE / NOT LOGGED IN MESSAGE
+				console.log( "updateAverageRating() error:", response.message );
+			}
+		} catch( error ) {
+			console.log( "updateAverageRating() error:", error );
+		}
+	}
+
+	async function updateAllAverageelement() {
+		try {
+			const response = await fetch(`${BACKEND_URL}/updateAllAverageelement`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+			});
+	
+			if (response.ok) {
+				const data = await response.json();
+				console.log(data.message);
+				// - Optionally, you can reload the marker data or perform any other necessary actions
+			} else {
+				const errorData = await response.json();
+				console.error('Error updating average element:', errorData.message);
+				// - Handle the error scenario, such as displaying an error message to the user
+			}
+		} catch (error) {
+			console.error('Error updating average element:', error);
+			// - Handle any network or other errors that may occur
+		}
+	}
+
 	/*|**********************************************
 					 Utility Functions
 	************************************************/
@@ -122,6 +172,33 @@ const MarkerDetails = ({ marker, onClose, generateStarRating }) => {
 		const colors = [ "#E43836", "#FD674D", "#FFC236", "#4CAF50","#36AE26"];
 		return colors[index % colors.length];
 	};
+
+	const getColorByRating = (averageRating) => {
+		const colors = [ "#E43836", "#FFC236","#36AE26", "#8A8A8A"];
+
+		if( averageRating > 0 && averageRating < 2 ) {
+			return colors[0];
+		} else if( averageRating >= 2 && averageRating < 4 ) {
+			return colors[1];
+		} else if( averageRating >= 4 ) {
+			return colors[2];
+		} else if( averageRating <= 0 ) {
+			return colors[3]
+		}
+	}
+
+	const getTextByAverageRating = (averageRating) => {
+		if( averageRating > 0 && averageRating < 2 ) {
+			return "Not Friendly";
+		} else if( averageRating >= 2 && averageRating < 4 ) {
+			return "Partially Friendly";
+		} else if( averageRating >= 4 ) {
+			return "Friendly";
+		} else if( averageRating <= 0 ) {
+			return "No Rating"
+		}
+	}
+
 
 	/*|**********************************************
 					  Event Handlers
@@ -172,29 +249,74 @@ const MarkerDetails = ({ marker, onClose, generateStarRating }) => {
 		</div>
 		<div className="marker-details-body">
 			<div className="marker-details-body rating">
-			<div className='rating-circle'>
-				<h1 className='rating-number'>{rating}</h1>
+			<div className='rating-circle'
+				style={{ backgroundColor: getColorByRating(markerData.averageRating)}}
+			>
+				<h1 className='rating-number'>   
+					{markerData.averageRating <= 0 ? '?' : markerData.averageRating}
+ 				</h1>
 			</div>
 			{/* TODO: Turn data to dynamic */}
-			<h4 className='rating-label'>Friendly</h4>
-			<div className="rating-buttons">
-				{/* Fix background colors */}
-				{[1, 2, 3, 4, 5].map((rating, index) => (
-				<button
-					key={rating}
-					onClick={() => handleRatingClick(rating)}
-					style={{ backgroundColor: getColorByIndex(index) }}
-				>
-					{rating}
-				</button>
+			<h4 className='rating-label'
+				style={{ color: getColorByRating(markerData.averageRating)}}
+			>
+				{getTextByAverageRating(markerData.averageRating)}
+			</h4>
+				<div className="rating-buttons">
+				{[1, 2, 3, 4, 5].map((element, index) => (
+					<button
+					key={element}
+					onClick={() => handleRatingClick(element)}
+					style={{
+						backgroundColor: rating === 0 ? getColorByIndex(index) : rating === element ? getColorByIndex(index) : 'white',
+						color: rating === 0 ? 'white' : rating === element ? 'white' : '#8A8A8A',
+						border: rating === 0 ? 'none' : rating === element ? 'none' : '1px solid #8A8A8A',
+						transition: 'background-color 0.3s, color 0.3s, border 0.3s',
+					}}
+					onMouseEnter={(e) => {
+						if (rating === 0) {
+						e.target.style.backgroundColor = 'white';
+						e.target.style.color = getColorByIndex(index);
+						e.target.style.border = `1px solid ${getColorByIndex(index)}`;
+						} else if (rating === element) {
+						e.target.style.backgroundColor = getColorByIndex(index);
+						e.target.style.color = 'white';
+						e.target.style.border = 'none';
+						} else {
+						e.target.style.backgroundColor = getColorByIndex(index);
+						e.target.style.color = 'white';
+						e.target.style.border = 'none';
+						}
+					}}
+					onMouseLeave={(e) => {
+						if (rating === 0) {
+						e.target.style.backgroundColor = getColorByIndex(index);
+						e.target.style.color = 'white';
+						e.target.style.border = 'none';
+						} else if (rating === element) {
+						e.target.style.backgroundColor = getColorByIndex(index);
+						e.target.style.color = 'white';
+						e.target.style.border = 'none';
+						} else {
+						e.target.style.backgroundColor = 'white';
+						e.target.style.color = '#8A8A8A';
+						e.target.style.border = '1px solid #8A8A8A';
+						}
+					}}
+					>
+					{element}
+					</button>
 				))}
-			</div>
+				</div>
 			</div>
 
 			<div className="community-notes">
 			<h4 className="community-notes-header">Community Notes</h4>
 			{markerReviews.map((note, index) => (
-				<MarkerNote username={note.author} comment={note.comment}/>
+				<MarkerNote 
+					username={note.author} comment={note.comment} userRating={note.rating} 
+					dateCreated={note.dateReviewed} getColorByRating={getColorByRating}
+				/>
 				//<p key={index}>{note}</p>
 			))}
 			</div>

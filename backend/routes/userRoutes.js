@@ -1,6 +1,6 @@
 import { db, auth } from '../firebase/firebase.js';
 import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { collection, addDoc, doc, setDoc, getDoc } from "firebase/firestore";
+import { collection, addDoc, doc, setDoc, getDoc, getDocs, query, where, updateDoc } from "firebase/firestore";
 
 const UserRoutes = {
 

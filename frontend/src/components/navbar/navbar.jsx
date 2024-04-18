@@ -73,7 +73,9 @@ const NavBar = () => {
                 <div className="userauth">
                     {isLoggedIn ? (
                         <>
-                            <span>Welcome, {userData.username} </span>
+                            <span style = {{ paddingRight: '10px', }}>
+                                Welcome, {userData.username} 
+                            </span>
                             <Button className="me-3 px-4" variant="primary" onClick={handleLogout}>
                                 Logout
                             </Button>

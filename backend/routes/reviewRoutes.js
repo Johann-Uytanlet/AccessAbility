@@ -56,7 +56,7 @@ const ReviewRoutes = {
             // - Create a query to filter markerReviews by markerID
             const querySnapshot = await getDocs(query(markerReviewsCollectionRef, where('markerID', '==', markerID)));
 
-            // Extract the matching markerReviews from the query snapshot
+            // - Extract the matching markerReviews from the query snapshot
             const reviews = querySnapshot.docs.map((doc) => ({
                 ...doc.data(),
             }));

@@ -89,8 +89,10 @@
     border-radius: 10px;
 }
 
+
 .rating-number {
     user-select: none;
+    font-size: 48px;
 }
 
 .rating-label {
@@ -119,6 +121,10 @@
     margin: 0.5rem;
 }
 
+.rating-circle h1 {
+    font-size: 84px;
+}
+
 .rating-buttons button {
     margin-right: 5px;
   }
@@ -133,9 +139,10 @@
 
 .comment-section textarea {
     width: 100%;
-    height: 50px; /* Adjust the desired height here */
+    height: 45px; /* Adjust the desired height here */
     padding: 5px;
     resize: vertical;
+    min-height: 45px;
     max-height: 120px; /* Add this line to set the maximum height */
     overflow-y: auto; /* Add this line to enable vertical scrolling */
     border-radius: 8px;
@@ -169,7 +176,7 @@
     line-height: 18px; /* 150% */
     display: flex;
     width: 5rem;
-    height: 23px;
+    height: 2rem;
     padding: 16px 24px;
     justify-content: center;
     align-items: center;
@@ -188,7 +195,7 @@
     line-height: 18px; /* 150% */
     display: flex;
     width: 6rem;
-    height: 23px;
+    height: 2rem;
     padding: 16px 24px;
     justify-content: center;
     align-items: center;
