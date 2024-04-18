@@ -5,7 +5,6 @@ import tryIcon from '../assets/try.png';
 //import partially from '../assets/partially.png'; 
 //import friendly from '../assets/friendly.png'; 
 
-
 function reviewMarker({ data, onMarkerClick }) {
     const markerRef = useRef(null);
     const lat = data.lat;
@@ -35,7 +34,6 @@ function reviewMarker({ data, onMarkerClick }) {
     [onMarkerClick],
   );
 
-
   return (
     <Marker
       eventHandlers={eventHandlers}
@@ -50,33 +48,5 @@ function reviewMarker({ data, onMarkerClick }) {
     </Marker>
   );
 }
-
-function generateStarRating(rating) {
-    if (rating < 0 || rating > 5) {
-      return 'Invalid rating value.';
-    }
-    else if(isNaN(rating)){
-      return 'No ratings yet, please add one'
-    }
-
-    const fullStar = '★';
-    const emptyStar = '☆';
-    let starString = '';
-
-    for (let i = 0; i < Math.floor(rating); i++) {
-      starString += fullStar;
-    }
-
-    const decimalPart = rating - Math.floor(rating);
-    if (decimalPart > 0) {
-      starString += fullStar.slice(0, 1); // Add half star if needed
-    }
-
-    for (let i = Math.floor(rating) + (decimalPart > 0 ? 1 : 0); i < 5; i++) {
-      starString += emptyStar;
-    }
-
-    return starString;
-  };
 
 export default reviewMarker;

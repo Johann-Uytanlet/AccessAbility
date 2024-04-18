@@ -3,7 +3,6 @@ import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 're
 import "leaflet/dist/leaflet.css";
 import L, {Icon, icon} from 'leaflet';
 import tryIcon from '../assets/try.png'; 
-import axios from 'axios';
 import DraggableMarker from './customMarker';
 import ReviewMarker from './reviewMarker';
 import BACKEND_URL from '../../config.js';
@@ -13,53 +12,36 @@ function MapComponent() {
     const [selectedMarker, setSelectedMarker] = useState(null); // State to store selected marker
     const [sidebarOpen, setSidebarOpen] = useState(false); // State to manage sidebar visibility
 
-    const myIcon = new Icon({
-      iconUrl: tryIcon,
-      iconSize: [50, 50],
-      popupAnchor: [0, -41],
-    });
-
     useEffect(() => {
-      console.log("before fetch");
       const fetchingData = async () =>{
         try{
-          await fetchMarkers();
-          console.log("markers");
-          console.log(markers);
+          	await fetchMarkers();
         } catch (err) {
-          console.log(err);
+          	console.log(err);
         }
       }
       fetchingData();
-      //console.log("marker");
-      //fetchMarkers();
-      //console.log(markers);
-      //setMarkers(fetchMarkers());
-      console.log("after fecth");
-    }
-    
-    , []);
+    }, []);
 
     const fetchMarkers = async () => {
-      console.log("before getallmarkers");
-      try {
-        console.log("before getallmarkers");
-          const response = await fetch(`${BACKEND_URL}/getAllMarkers`, {
-              method: 'GET',
-              headers: { 'Content-Type': 'application/json' }
-          });
-          if( response.ok ) {
-            console.log("waiting for data");
-            const data = await response.json();
-            console.log(data);
-            setMarkers(data);
-          } else {
-            const errorData = await response.json();
-            console.error('Error fetching markers:', errorData.error);
-          }
-      } catch (error) {
-        console.error('Error fetching markers:', error);
-      }
+		console.log("before getallmarkers");
+		try {
+			console.log("before getallmarkers");
+			const response = await fetch(`${BACKEND_URL}/getAllMarkers`, {
+				method: 'GET',
+				headers: { 'Content-Type': 'application/json' }
+			});
+
+			if( response.ok ) {
+				const data = await response.json();
+				setMarkers(data);
+			} else {
+				const errorData = await response.json();
+				console.error('Error fetching markers:', errorData.error);
+			}
+		} catch (error) {
+			console.error('Error fetching markers:', error);
+		}
     };
 
     async function createMarker( name, lat, lng ) {
@@ -92,84 +74,57 @@ function MapComponent() {
     function MyMarkers({ markers }) {
       console.log(markers);
       return (
-        
         <>
-          {markers.map((marker, index) => (
-            <ReviewMarker key={index} data={marker} onMarkerClick={handleMarkerClick} />
-          ))}
+			{markers.map((marker, index) => (
+				<ReviewMarker key={index} data={marker} onMarkerClick={handleMarkerClick} />
+			))}
         </>
       );
     }
 
     function generateStarRating(rating) {
-      if (rating < 0 || rating > 5) {
-        return 'Invalid rating value.';
-      }
-      else if(isNaN(rating)){
-        return 'No ratings yet, please add one'
-      }
+		if (rating < 0 || rating > 5) {
+			return 'Invalid rating value.';
+		}
+		else if(isNaN(rating)){
+			return 'No ratings yet, please add one'
+		}
 
-      const fullStar = '★';
-      const emptyStar = '☆';
-      let starString = '';
+		const fullStar = '★';
+		const emptyStar = '☆';
+		let starString = '';
 
-      for (let i = 0; i < Math.floor(rating); i++) {
-        starString += fullStar;
-      }
+		for (let i = 0; i < Math.floor(rating); i++) {
+			starString += fullStar;
+		}
 
-      const decimalPart = rating - Math.floor(rating);
-      if (decimalPart > 0) {
-        starString += fullStar.slice(0, 1); // Add half star if needed
-      }
+		const decimalPart = rating - Math.floor(rating);
+		if (decimalPart > 0) {
+			starString += fullStar.slice(0, 1); // Add half star if needed
+		}
 
-      for (let i = Math.floor(rating) + (decimalPart > 0 ? 1 : 0); i < 5; i++) {
-        starString += emptyStar;
-      }
+		for (let i = Math.floor(rating) + (decimalPart > 0 ? 1 : 0); i < 5; i++) {
+			starString += emptyStar;
+		}
 
-      return starString;
+		return starString;
     };
 
     function MyComponent() {
         const map = useMapEvents({
-          click: async (e) => {
-            const { lat, lng } = e.latlng;
-            const name = prompt(
-                'What is the name of the Building?'
-            );     
-              if (name) {
-                let rating;
-                do {
-                  rating = prompt('What is your Rating (0-5)');
-                  rating = parseFloat(rating);
-                } while (isNaN(rating) || rating < 0 || rating > 5);
-                
-              
-                  let center = [lat, lng]
-                  const newMarker = {
-                    center,
-                    name,
-                    rating,
-                  };
+			click: async (e) => {
+				const name = prompt('What is the name of the building?');     
+				const { lat, lng } = e.latlng;
 
-                  try {
-                    await createMarker(name, lat, lng);
-                    // If createMarker succeeds, you can do further operations here
-                    // For example, updating state or showing a message
-                  } catch (error) {
-                    console.error('Error creating marker:', error);
-                    // Handle error accordingly, e.g., show an error message to the user
-                  }
-                  // setMarkers(prevMarkers => [...prevMarkers, newMarker]);
-                  // `name: ${name}, rating: ${rating}, comment: ${comment}`
-                  //L.marker([lat, lng], { icon: myIcon }).addTo(map).bindPopup(customPopup, customOptions).openPopup();
-                  //handleAddMarker(name, rating, comment, [lat, lng])
-              }
-          }
+				try {
+					await createMarker(name, lat, lng);				
+				} catch( error ) {
+					console.log("Marker creation failed")
+				}
+			}
         });
-        return null;
-      }
-
-    
+		return null;
+    }
 
     const handleMarkerClick = (data) => {
       console.log("Here");
@@ -194,7 +149,6 @@ function MapComponent() {
             <p>Name: {selectedMarker.location}</p>
             <p>Rating: {generateStarRating(selectedMarker.rating)}</p>
             
-            
           </div>
         )}
       </div>
@@ -202,40 +156,10 @@ function MapComponent() {
         <MapContainer center={[14.586598,120.976342]} zoom={20} style={{ height: '900px', width: '100%' }}>
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         <MyComponent />
-        
         <MyMarkers markers={markers} />
         </MapContainer>
-        
       </div>
-        
     );
-    }
+}
 
-    function generateStarRating(rating) {
-      if (isNaN(rating) || rating < 0 || rating > 5) {
-        return 'Invalid rating value.';
-      }
-
-      const fullStar = '★';
-      const emptyStar = '☆';
-      let starString = '';
-
-      for (let i = 0; i < Math.floor(rating); i++) {
-        starString += fullStar;
-      }
-
-      const decimalPart = rating - Math.floor(rating);
-      if (decimalPart > 0) {
-        starString += fullStar.slice(0, 1); // Add half star if needed
-      }
-
-      for (let i = Math.floor(rating) + (decimalPart > 0 ? 1 : 0); i < 5; i++) {
-        starString += emptyStar;
-      }
-
-      return starString;
-    };
-
-    
-    
-    export default MapComponent;
+export default MapComponent;

@@ -13,12 +13,7 @@ const RegisterModal = ({ showRegister, handleRegisterClose }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [username, setUsername] = useState('');
-    const [birthday, setBirthday] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-
-    useEffect(() => {
-        fetchUserData();
-    }, []);
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -27,7 +22,6 @@ const RegisterModal = ({ showRegister, handleRegisterClose }) => {
             username: username,
             email: email,
             password: password,
-            birthday: birthday
         }
 
         try {
@@ -39,7 +33,6 @@ const RegisterModal = ({ showRegister, handleRegisterClose }) => {
       
             if( response.ok ) {
                 alert('Registration Successful');
-                // - Optionally, we can redirect the user to another page after successful registration
             } else {
                 const { message } = await response.json();
                 alert(`Registration Error: ${message}`);
@@ -50,24 +43,6 @@ const RegisterModal = ({ showRegister, handleRegisterClose }) => {
         }
     };
 
-    async function fetchUserData() {
-        try {
-            const response = await fetch(`${BACKEND_URL}/getUserData`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json', },
-            });
-
-            if( response.ok ) {
-                const { user } = await response.json();
-                setUserData(user);
-                setIsLoggedIn(true);
-            } else {
-                setIsLoggedIn(false);
-            }
-        } catch( error ) {
-            console.error('Error retrieving user data:', error);
-        }
-    }
     return (
         <Modal show={showRegister} onHide={handleRegisterClose} centered>
             <>
