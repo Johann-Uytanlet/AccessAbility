@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './MarkerDetails.css';
 import closeIcon from '../../assets/x.svg';
+import MarkerNote from '../MarkerNote/MarkerNote.jsx'
 import BACKEND_URL from '../../../config.js';
 
 /*
@@ -29,7 +30,7 @@ const MarkerDetails = ({ marker, onClose, generateStarRating }) => {
     useEffect(() => {
 		try {
 			setMarkerData(marker);
-			console.log("markerID:", markerData.id );
+			console.log("markerID:", markerData.markerID);
 		} catch( error ) {
 			console.log( "useEffect Error: setMarkerData() failed" );
 		}
@@ -44,7 +45,7 @@ const MarkerDetails = ({ marker, onClose, generateStarRating }) => {
 			}
 		};
 	
-		if( markerData && markerData.id ) {
+		if( markerData && markerData.markerID) {
 		  	fetchMarkerReviews();
 		}
 	  }, [markerData]);
@@ -59,13 +60,13 @@ const MarkerDetails = ({ marker, onClose, generateStarRating }) => {
 	// - Also calls "setMarkerReviews()" to ensure the latest data is being used
 	async function retrieveAllMarkerReviews() {
 		try {
-			if( !markerData || !markerData.id ) {
-				console.log( "markerData or markerData.id is undefined" );
+			if( !markerData || !markerData.markerID) {
+				console.log( "markerData or markerData.markerIDis undefined" );
 				return;
 			}
 	
 			const response = await fetch( 
-				`${BACKEND_URL}/getAllMarkerReviews?` + new URLSearchParams({markerID: markerData.id}), {
+				`${BACKEND_URL}/getAllMarkerReviews?` + new URLSearchParams({markerID: markerData.markerID}), {
 				method: 'GET',
 				headers: { 'Content-Type': 'application/json' },
 			});
@@ -90,7 +91,7 @@ const MarkerDetails = ({ marker, onClose, generateStarRating }) => {
 			}
 
 			const form = {
-				markerID: markerData.id, 
+				markerID: markerData.markerID, 
 				rating: rating, 
 				comment: comment.trim(),
 				dateReviewed: new Date()
@@ -103,7 +104,7 @@ const MarkerDetails = ({ marker, onClose, generateStarRating }) => {
 			});
 
 			if( response.ok ) {
-				// - do some stuff idk
+				retrieveAllMarkerReviews();
 			} else {
 				// - SHOW ERROR MESSAGE / NOT LOGGED IN MESSAGE
 				console.log( "retrieveAllMarkerReviews() error:", response.message );
@@ -163,7 +164,7 @@ const MarkerDetails = ({ marker, onClose, generateStarRating }) => {
 		<div className="marker-details-header">
 			<div className="place">
 			{/* TODO: Insert marker logo here (see figma) */}
-			<h3>{markerData.location}</h3>
+			<h3>{markerData.name}</h3>
 			</div>
 			<button onClick={onClose}>
 			<img src={closeIcon} alt="Close" />
@@ -172,7 +173,7 @@ const MarkerDetails = ({ marker, onClose, generateStarRating }) => {
 		<div className="marker-details-body">
 			<div className="marker-details-body rating">
 			<div className='rating-circle'>
-				<h1>{rating}</h1>
+				<h1 className='rating-number'>{rating}</h1>
 			</div>
 			{/* TODO: Turn data to dynamic */}
 			<h4 className='rating-label'>Friendly</h4>
@@ -193,7 +194,8 @@ const MarkerDetails = ({ marker, onClose, generateStarRating }) => {
 			<div className="community-notes">
 			<h4 className="community-notes-header">Community Notes</h4>
 			{markerReviews.map((note, index) => (
-				<p key={index}>{note.rating} : {note.comment}</p>
+				<MarkerNote username={note.author} comment={note.comment}/>
+				//<p key={index}>{note}</p>
 			))}
 			</div>
 			<div className="comment-section">
@@ -216,7 +218,7 @@ const MarkerDetails = ({ marker, onClose, generateStarRating }) => {
 			</div>
 		</div>
 		</div>
- 	);
+  );
 };
 
 export default MarkerDetails;
