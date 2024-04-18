@@ -10,7 +10,7 @@ function reviewMarker({ data, onMarkerClick }) {
     const lat = data.lat;
     const lng = data.lng;
     //const center = data.center;
-    const name = data.name;
+    const name = data.location;
     const rating = data.rating;
 
     const icon = useMemo(
@@ -40,9 +40,10 @@ function reviewMarker({ data, onMarkerClick }) {
       icon={icon} 
       position={[lat, lng]}
       ref={markerRef}>
+        
       <Popup minWidth={90}>
         <span>
-          Trying
+          {name}
         </span>
       </Popup>
     </Marker>

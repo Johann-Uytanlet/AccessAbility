@@ -21,7 +21,7 @@ const UserRoutes = {
 
     registerUser: async (req, res) => {
         try {
-            const { username, birthday, email, password } = req.body;
+            const { username, email, password } = req.body;
     
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
@@ -32,7 +32,6 @@ const UserRoutes = {
             await setDoc(userDocRef, {
                 username: username,
                 email: email,
-                birthday: birthday,
             });
     
             return res.status(201).send({ message: 'Registration successful' });

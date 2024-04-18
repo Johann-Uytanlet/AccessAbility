@@ -20,7 +20,6 @@ const ReviewRoutes = {
                 rating: rating, 
                 comment: comment, 
             });
-            
             return res.status(201).json({ message: 'Review created successfully' });
         } catch (error) {
             console.error('Error creating review', error);
@@ -44,30 +43,6 @@ const ReviewRoutes = {
             return res.status(500).json({ message: 'Failed to get all marker reviews' });
         }
     },
-
-    /*
-        getMarkerReview: async (req, res) => {
-            try {
-            } catch( error ) {
-            }
-        },
-
-        deleteMarkerReview: async (req, res) => {
-            try {
-
-            } catch( error ) {
-
-            }
-        },
-
-        updateMarkerReview: async (req, res) => {
-            try {
-
-            } catch( error ) {
-
-            }
-        },
-    */
 }
 
 export default ReviewRoutes;

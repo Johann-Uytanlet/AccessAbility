@@ -10,34 +10,79 @@ const MarkerDetails = ({ markerData, onClose, generateStarRating }) => {
     const [cancelClicked, setCancelClicked] = useState(false);
     const [rating, setRating] = useState(0);
 
+    useEffect(() => {
+        const fetchingData = async () =>{
+          try{
+            await fetchMarkerReviews();
+          } catch (err) {
+                console.log(err);
+          }
+        }
+        fetchingData();
+    }, []);
+
+    async function fetchMarkerReviews() {
+        try {
+            const markerID = markerData.id;
+			      const response = await fetch(`${BACKEND_URL}/getAllMarkerReviews?markerID=${markerID}`, {
+			    	method: 'GET',
+			    	headers: { 'Content-Type': 'application/json' }
+			      });
+
+            if( response.ok ) {
+                const reviewsData = await response.json();
+                setCommunityNotes(reviewsData);
+            } else {
+                const errorData = await response.json();
+				console.error('Error fetching markers:', errorData.message);
+            }
+        } catch( error ) {
+            console.error( 'Error fetching marker reviews', error );
+        }
+    }
+
+    async function createReview() {
+      try {
+          const form = {
+            markerID: markerData.id,
+            rating: rating, 
+            comment: comment.trim(),
+          }
+
+          const BACKENDS_URL = 'http://localhost:5555'; // Replace with your backend URL and port
+
+          const response = await fetch(`${BACKENDS_URL}/createMarkerReview`, {
+            method:'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(form),
+        });
+          
+          if( response.ok ) {
+              alert("REVIEW WAS CREATEED");
+              fetchMarkerReviews()
+          } else {
+              alert( `${response.status} ${response.message}`)
+          }
+  
+      } catch(error) {
+        console.error('Error creating review:', error);
+        alert("REVIEW WAS NOT CREATED");
+      }
+    };
+
     const handleRatingClick = (rating) => {
         console.log(`Rating ${rating} clicked`);
         setRating(rating)
     };
 
     const handleCommentSubmit = async () => {
+
         if( !rating ) {
             alert('Please choose a rating');
             return;
         }
 
-		const form = {
-		};
-
-        try {
-          const response = await fetch( `${BACKEND_URL}/createMarkerReview`, {
-            method:'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(form),
-          });
-          alert(response.status);
-          alert(response.message);
-        } catch( error ) {
-          alert('Fetch Error')
-        }
-
-        setCommunityNotes([...communityNotes, comment.trim()]);
-        setComment('');
+        createReview();
     };
 
   const getColorByIndex = (index) => {
@@ -90,7 +135,7 @@ const MarkerDetails = ({ markerData, onClose, generateStarRating }) => {
         <div className="community-notes">
           <h4 className="community-notes-header">Community Notes</h4>
           {communityNotes.map((note, index) => (
-            <p key={index}>{note}</p>
+            <p key={index}>{note.username} (note.rating): {note.comment} </p>
           ))}
         </div>
         <div className="comment-section">

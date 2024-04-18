@@ -3,17 +3,50 @@ import { collection, addDoc, doc, setDoc, getDoc, getDocs } from "firebase/fires
 
 const MarkerRoutes = {
 
+    createMarkerReview: async (req, res) => {
+        try {
+            const { markerID, rating, comment } = req.body;
+    
+            // - Create new marker review
+            const markerReviewsCollectionRef = collection(db, 'markerReviews');
+            await addDoc(markerReviewsCollectionRef, {
+                markerID: markerID,
+                rating: rating, 
+                comment: comment, 
+            });
+            return res.status(201).json({ message: 'Review created successfully' });
+        } catch (error) {
+            console.error('Error creating review', error);
+            return res.status(500).json({ message: 'Failed to create review', error: error.message });
+        }
+    },
+
+    getAllMarkerReviews: async (req, res) => {
+        try {
+            const markerID = req.query.markerID;
+            const reviews = [];
+            const markerReviewsCollectionRef = collection(db, 'markerReviews');
+			const reviewsSnapshot = await getDocs(markerReviewsCollectionRef);
+			reviewsSnapshot.forEach((doc) => {
+                if( reviews.markerID == markerID ) {
+                    reviews.push(doc.data());
+                }
+			});
+			return res.status(200).json(reviews);
+        } catch( error ) {
+            return res.status(500).json({ message: 'Failed to get all marker reviews' });
+        }
+    },
+
 	createMarker: async (req, res) => {
 		try {
 			const { location, lat, lng } = req.body;
 
 			// - Get user data from session
-			/*
 			const currentUser = auth.currentUser;
             const userRef = doc( db, 'users', currentUser.uid );
             const userSnap = await getDoc(userRef);
 			const user = userSnap.data();
-			*/
 			
 			// - Create new marker 
 			const markersCollectionRef = collection(db, 'markers');
@@ -63,43 +96,6 @@ const MarkerRoutes = {
 		  	return res.status(500).json({ error: 'Failed to retrieve marker' });
 		}
 	},
-
-  	createMarkerReview: async (req, res) => {
-		try {
-			const { markerID, userID, rating, comment, filePath } = req.body;
-			const user = auth.currentUser;
-
-			if( !user ) {
-				return res.status(401).json({ error: 'Unauthorized' });
-			}
-
-			// - Create a new marker review
-			const newReview = {
-				markerID,
-				userID: user.uid,
-				username: user.username,
-				rating,
-				comment,
-				filePath,
-			};
-			await addDoc(collection(db, 'markerReviews'), newReview);
-
-			// - Update average rating for the marker
-			const markerRef = doc(db, 'markers', markerID);
-			const markerSnapshot = await getDoc(markerRef);
-			const marker = markerSnapshot.data();
-			const updatedAverageRating = (marker.averageRating * marker.reviewCount + rating) / (marker.reviewCount + 1);
-			
-			await updateDoc(markerRef, {
-				averageRating: updatedAverageRating,
-				reviewCount: marker.reviewCount + 1,
-			});
-
-			return res.status(201).json(newReview);
-		} catch( error ) {
-			return res.status(500).json({ error: 'Failed to create marker review' });
-		}
-  	},
 
   	getMarkerReviews: async (req, res) => {
 		try {

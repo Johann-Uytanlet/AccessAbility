@@ -14,9 +14,7 @@ router.post( '/logout', UserRoutes.logoutUser )
 
 // - Marker Routes
 router.get( '/getAllMarkers', MarkerRoutes.getAllMarkers );
-router.get( '/getMarkerReviews', MarkerRoutes.getMarkerReviews );
 router.post( '/createMarker', MarkerRoutes.createMarker );
-router.post( '/createMarkerReview', MarkerRoutes.createMarkerReview )
 
 // - Review Routes
 router.get( '/getAllMarkerReviews', ReviewRoutes.getAllMarkerReviews );
