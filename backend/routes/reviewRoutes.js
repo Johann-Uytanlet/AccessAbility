@@ -1,5 +1,5 @@
 import { db, auth } from '../firebase/firebase.js';
-import { collection, addDoc, doc, setDoc, getDoc, getDocs } from "firebase/firestore";
+import { collection, addDoc, doc, setDoc, getDoc, getDocs, query, where } from "firebase/firestore";
 
 const ReviewRoutes = {
 
@@ -29,18 +29,24 @@ const ReviewRoutes = {
 
     getAllMarkerReviews: async (req, res) => {
         try {
-            const markerID = req.query.markerID;
-            const reviews = [];
+            const { markerID } = req.query;
+
+            console.log( "MarkerID:", markerID );
+
             const markerReviewsCollectionRef = collection(db, 'markerReviews');
-			const reviewsSnapshot = await getDocs(markerReviewsCollectionRef);
-			reviewsSnapshot.forEach((doc) => {
-                if( reviews.markerID == markerID ) {
-                    reviews.push(doc.data());
-                }
-			});
+
+            // - Create a query to filter markerReviews by markerID
+            const querySnapshot = await getDocs(query(markerReviewsCollectionRef, where('markerID', '==', markerID)));
+
+            // Extract the matching markerReviews from the query snapshot
+            const reviews = querySnapshot.docs.map((doc) => ({
+                ...doc.data(),
+            }));
+
 			return res.status(200).json(reviews);
         } catch( error ) {
-            return res.status(500).json({ message: 'Failed to get all marker reviews' });
+            console.error('Error getting marker reviews:', error);
+            return res.status(500).json({ message: 'Failed to get marker reviews' });        
         }
     },
 }

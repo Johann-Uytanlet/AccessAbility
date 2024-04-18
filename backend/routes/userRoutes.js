@@ -8,6 +8,7 @@ const UserRoutes = {
         try {
             const { email, password } = req.body;
 
+            // - Login with Firebase authentication
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
             const userToken = await user.getIdToken();
@@ -22,16 +23,19 @@ const UserRoutes = {
     registerUser: async (req, res) => {
         try {
             const { username, email, password } = req.body;
-    
+            
+            // - Login with Firebase authentication
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
     
+            // - Add user details to Firebase database
             const usersCollectionRef = collection(db, 'users');
             const userDocRef = doc(usersCollectionRef, user.uid);
     
             await setDoc(userDocRef, {
                 username: username,
                 email: email,
+                pfp: '' // file path
             });
     
             return res.status(201).send({ message: 'Registration successful' });
@@ -43,6 +47,7 @@ const UserRoutes = {
 
     logoutUser: async (req, res) => {
         try {
+            // - Logout with Firebase authentication
             signOut(auth)
             return res.status(201).send({ message: 'Logout successful' });
         } catch( error ) {

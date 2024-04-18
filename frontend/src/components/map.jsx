@@ -8,27 +8,77 @@ import ReviewMarker from './reviewMarker';
 import BACKEND_URL from '../../config.js';
 import MarkerDetails from './MarkerDetails/MarkerDetails'
 
+/*
+	Code Categorization
+
+	State Management
+	Sub-components
+	API Functions
+	Utility Functions
+	Event Handlers
+	Render JSX
+*/
 function MapComponent() {
+
+	/*|*********************************************
+					 State Management
+	************************************************/
     const [markers, setMarkers] = useState([]); // Array to store marker data
     const [selectedMarker, setSelectedMarker] = useState(null); // State to store selected marker
     const [sidebarOpen, setSidebarOpen] = useState(false); // State to manage sidebar visibility
     const [showMarkerDetails, setShowMarkerDetails] = useState(false);
 
     useEffect(() => {
-      const fetchingData = async () =>{
-        try{
-          	await fetchMarkers();
-        } catch (err) {
-          	console.log(err);
-        }
-      }
-      fetchingData();
+		const fetchingData = async () =>{
+			try {
+				await retrieveAllMarkers();
+			} catch (err) {
+				console.log(err);
+			}
+		}
+      	fetchingData();
     }, []);
 
-    const fetchMarkers = async () => {
-		console.log("before getallmarkers");
+	/*|**********************************************
+				   	Child Components
+	************************************************/
+    function MyMarkers({ markers }) {
+		console.log(markers);
+		return( 
+			<>
+			  	{markers.map((marker, index) => (
+				  	<ReviewMarker key={index} data={marker} onMarkerClick={handleMarkerClick} />
+			  	))}
+		  	</>
+		);
+	}
+  
+	function MyComponent() {
+		const map = useMapEvents({
+			click: async (e) => {
+				const name = prompt('What is the name of the building?');     
+				const { lat, lng } = e.latlng;
+
+				if( !name || name == '' || name == undefined ) {
+					return null;
+				} 
+
+				try { 
+					await createMarker(name, lat, lng);				
+				} catch( error ) {
+					console.log( "Marker creation failed")
+				}
+			}
+		});
+		return null;
+	}
+
+	/*|**********************************************
+				  	  API Functions
+	************************************************/
+	// - Also calls "setMarkers()" to ensure the latest data is being used
+    async function retrieveAllMarkers() {
 		try {
-			console.log("before getallmarkers");
 			const response = await fetch(`${BACKEND_URL}/getAllMarkers`, {
 				method: 'GET',
 				headers: { 'Content-Type': 'application/json' }
@@ -46,45 +96,37 @@ function MapComponent() {
 		}
     };
 
+	// - Also calls "setMarkers()" through "retrieveAllMarkers()" 
     async function createMarker( name, lat, lng ) {
-      try {
-          const form = {
-              location: name, 
-              lat: lat,
-              lng: lng
-          };
-  
-          const response = await fetch(`${BACKEND_URL}/createMarker`, {
-              method:'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(form),
-          });
-          
-          if( response.ok ) {
-              fetchMarkers();
-          }
+		try {
+			const form = {
+				name: name, 
+				lat: lat,
+				lng: lng,
+			};
+	
+			const response = await fetch(`${BACKEND_URL}/createMarker`, {
+				method:'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(form),
+			});
+			
+			if( response.ok ) {
+				retrieveAllMarkers(); 
+			}
 
-      } catch(error) {
-        console.error('Error creating marker:', error);
-      }
-    };
-
-    function MyMarkers({ markers }) {
-      console.log(markers);
-      return (
-        <>
-			{markers.map((marker, index) => (
-				<ReviewMarker key={index} data={marker} onMarkerClick={handleMarkerClick} />
-			))}
-        </>
-      );
-    }
-
-    function generateStarRating(rating) {
-		if (rating < 0 || rating > 5) {
-			return 'Invalid rating value.';
+		} catch(error) {
+			console.error('Error creating marker:', error);
 		}
-		else if(isNaN(rating)){
+	};
+
+	/*|**********************************************
+					 Utility Functions
+	************************************************/
+    function generateStarRating(rating) {
+		if( rating < 0 || rating > 5 ) {
+			return 'Invalid rating value.';
+		} else if(isNaN(rating)){
 			return 'No ratings yet, please add one'
 		}
 
@@ -92,12 +134,12 @@ function MapComponent() {
 		const emptyStar = '☆';
 		let starString = '';
 
-		for (let i = 0; i < Math.floor(rating); i++) {
+		for( let i = 0; i < Math.floor(rating); i++ ) {
 			starString += fullStar;
 		}
 
 		const decimalPart = rating - Math.floor(rating);
-		if (decimalPart > 0) {
+		if( decimalPart > 0 ) {
 			starString += fullStar.slice(0, 1); // Add half star if needed
 		}
 
@@ -108,41 +150,27 @@ function MapComponent() {
 		return starString;
     };
 
-    function MyComponent() {
-        const map = useMapEvents({
-			click: async (e) => {
-				const name = prompt('What is the name of the building?');     
-				const { lat, lng } = e.latlng;
-
-        if( !name || name == '' || name == undefined ) {
-          return null;
-        } 
-
-				try { 
-					await createMarker(name, lat, lng);				
-				} catch( error ) {
-					console.log( "Marker creation failed")
-				}
-			}
-        });
-		return null;
-    }
-
+	/*|**********************************************
+					  Event Handlers
+	************************************************/
     const handleMarkerClick = (data) => {
-      setSelectedMarker(data);
-      setShowMarkerDetails(true);
-    };
+		setSelectedMarker(data);
+		setShowMarkerDetails(true);
+	};
+	
+	  const closeMarkerDetails = () => {
+		setShowMarkerDetails(false);
+	};
   
-    const closeMarkerDetails = () => {
-      setShowMarkerDetails(false);
-    };
 
-    
+	/*|**********************************************
+					   Render JSX
+	************************************************/
     return (
       <div style={{ display: 'flex', height: '100vh' }}>
         {showMarkerDetails && (
           <div className="marker-details-container">
-            <MarkerDetails markerData={selectedMarker} onClose={closeMarkerDetails} generateStarRating={generateStarRating} />
+            <MarkerDetails marker={selectedMarker} onClose={closeMarkerDetails} generateStarRating={generateStarRating} />
           </div>
         )}
         <MapContainer center={[14.586598,120.976342]} zoom={20} style={{ height: '900px', width: '100%' }}>
